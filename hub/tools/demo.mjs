@@ -27,7 +27,7 @@ const track = { status: "playing", title: "Placeholder Song", artist: "The Demo 
 const nextEvent = () => {
   const d = new Date(); d.setDate(d.getDate() + 1); d.setHours(9, 0, 0, 0);
   const card = { title: "Dentist", short: "Dentist", start: iso(+d), end: iso(+d + 45 * 60e3), all_day: false, location: null, in_min: Math.round((+d - Date.now()) / 60e3), started: false };
-  return { next: card, now: [], upcoming: [card], read_at: iso(Date.now()) };
+  return { status: "ok", next: card, now: [], upcoming: [card], read_at: iso(Date.now()) };
 };
 
 const hub = await createHub({
