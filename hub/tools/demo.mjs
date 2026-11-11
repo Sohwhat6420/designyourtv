@@ -23,7 +23,7 @@ const services = [
   { no: "52", operator: "SBST", next: [7, 19, 33] },
   { no: "88", operator: "SMRT", next: [1, 11, 24] },
 ].map(s => ({ ...s, next: s.next.map(m => ({ min: m, eta: inMin(m), load: m < 5 ? "SDA" : "SEA", type: "DD", monitored: true, feature: "WAB" })) }));
-const track = { status: "playing", title: "Placeholder Song", artist: "The Demo Band", album: "Sample Sessions", duration_s: 214, position_s: 61, app: "demo", read_at: iso(Date.now()) };
+const track = { status: "playing", title: "Clair de lune", artist: "Claude Debussy", album: "Suite bergamasque", duration_s: 300, position_s: 61, app: "demo", read_at: iso(Date.now()) };
 const nextEvent = () => {
   const d = new Date(); d.setDate(d.getDate() + 1); d.setHours(9, 0, 0, 0);
   const card = { title: "Dentist", short: "Dentist", start: iso(+d), end: iso(+d + 45 * 60e3), all_day: false, location: null, in_min: Math.round((+d - Date.now()) / 60e3), started: false };

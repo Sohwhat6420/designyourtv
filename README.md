@@ -1,15 +1,33 @@
 # designyourtv
 
+**Your Google TV's idle screen becomes a painted lock screen, with the clock standing behind the painting.**
+
 [![test](https://github.com/Sohwhat6420/designyourtv/actions/workflows/test.yml/badge.svg)](https://github.com/Sohwhat6420/designyourtv/actions/workflows/test.yml)
 ![licence: MIT](https://img.shields.io/badge/licence-MIT-blue)
 ![Google TV and Android TV](https://img.shields.io/badge/Google%20TV-Android%20TV-3DDC84?logo=android&logoColor=white)
-![Node 22](https://img.shields.io/badge/node-22-339933?logo=nodedotjs&logoColor=white)
 
-A painted lock screen for an Android TV / Google TV. The clock sits *behind* the painting's subject, glass widgets
-float over it, and a dock of apps rises the moment you touch the remote. One small hub on your LAN feeds it, and a
-setup page in any browser decides what it shows.
+<img src="docs/screens/tv.webp" width="100%" alt="The TV: an oil painting of two F-22s over snowy mountains at dusk. The clock, 10:47, sits behind the nearer jet; glass widgets either side show the calendar, the next event, buses, batteries, Claude limits and the week's usage, and a music card sits at the bottom.">
 
-![The TV at dusk: the clock passes behind the tree and the near hills, glass widgets either side](docs/screens/tv.webp)
+<sub>The repo's own demo with sample readings, at the TV panel's 1920 × 1080. The painting is an oil-paint repaint,
+made with an image model, of a public-domain U.S. Air Force photo (<a href="#credits">credits</a>).</sub>
+
+- **The clock sits inside the painting.** Each painting is cut into layers once, on your own computer, by two small ONNX models. The
+  clock is drawn between the layers, and depth pauses whenever a foreground would hide more than 38 % of the digits.
+- **Widgets that never fake a number.** They show the calendar, live buses, batteries, Claude limits, the weather and
+  music, and a stale reading greys out and says how old it is.
+- **The remote stays in charge.** Any arrow raises a dock of apps; Home brings the painting back. The TV side builds
+  on CleanYourTV's findings, so casting keeps working.
+
+## Quick start (no TV needed)
+
+```bash
+git clone https://github.com/Sohwhat6420/designyourtv && cd designyourtv
+node hub/tools/demo.mjs   # Node 22; then open http://127.0.0.1:8790/tv-setup.html?kiosk=tv
+```
+
+The demo runs the real hub with sample readings. It touches no adb, no device and nothing on your machine; the page
+fetches its fonts from Google Fonts. Press an
+arrow key for the dock, or open `tv-setup.html` without `?kiosk=tv` for the setup page.
 
 It is the frontend half of a TV clean-up. The backend half (what is safe to switch off on a Google TV, how to keep
 casting working, how to take over the Home button without replacing the launcher) builds on
@@ -17,11 +35,28 @@ casting working, how to take over the Home button without replacing the launcher
 Want the same look on a Windows desktop? That is [designyourwindows](https://github.com/Sohwhat6420/designyourwindows),
 kept separate and deliberately small.
 
+## How it works
+
+```mermaid
+flowchart LR
+  setup["Setup page<br/>any browser on the LAN"] -- "saves as you go" --> cfg[("config.json<br/>with history")]
+  subgraph hub["Hub: one always-on computer, port 8790, LAN and loopback only, zero dependencies"]
+    cfg --> srv["hub/server.mjs"]
+    rd["Readers<br/>LTA buses, ICS calendar, NEA weather,<br/>phones over adb, Claude limits"] --> srv
+  end
+  srv -- "server-sent events:<br/>config, readings, music" --> tv["TV: dev.designyourtv<br/>screensaver, Wallpaper tile,<br/>Home key service, dock"]
+  srv -- "on and off through tools/tv-guard.mjs<br/>(adb, Wake-on-LAN, Cast)" --> tv
+```
+
+The TV only ever shows the configuration; it never changes it. An offline copy of the page shows whenever the hub
+doesn't answer. The Claude limits widget runs a tiny headless `claude -p` probe on Haiku at most every 10 minutes
+(about USD0.0002 of your subscription each time).
+
 ## What it looks like
 
 ### Depth-clock paintings
 
-![The same scene at dawn with a serif face: the tree stands in front of the minutes](docs/screens/tv-dawn.webp)
+![A second painting: one F-22 climbing past a storm cloud at sunset, the clock in a serif face behind the cloud's edge](docs/screens/tv-thunderhead.webp)
 
 Each painting is four layers: the painting, a foreground cut-out, the same plus near clouds, and the subject alone.
 The clock is drawn between them, so hills, trees and clouds pass in front of the digits the way they do on an iPhone
@@ -31,7 +66,7 @@ lock screen. The cut-outs come from two small ONNX models run once on your own c
 
 Per painting you pick the face (ten, from condensed to didone), the colour (or *auto*, sampled from the painting),
 the material (ghost, liquid glass, tinted), size, stretch, width, where the clock sits, and whether hours stack over
-minutes. Changing painting is one authored 1.7 s move: a slow camera push, the digits cascading into the new face,
+minutes. Changing painting is a single 1.7 s move: a slow camera push, the digits cascading into the new face,
 the widgets stepping back and returning in the new palette.
 
 ### Glass widgets
@@ -68,20 +103,11 @@ The setup page (`tv-setup.html`) is where you decide: Keep or Remove each painti
 apps. It saves to the hub as you go, and the TV (`?kiosk=tv`) follows over server-sent events. The TV only ever shows
 the configuration; it never changes it.
 
-## Try it in your browser (no TV needed)
+## Paintings and app icons
 
-```bash
-git clone https://github.com/Sohwhat6420/designyourtv && cd designyourtv
-node hub/tools/demo.mjs
-```
-
-Open <http://127.0.0.1:8790/tv-setup.html?kiosk=tv> for what the TV shows (press an arrow key for the dock), or
-<http://127.0.0.1:8790/tv-setup.html> for the setup page. The demo runs the real hub with sample readings: it touches
-no adb, no network and nothing on your machine, and its state lives in a temporary folder. Every screenshot above is
-this demo in headless Chromium.
-
-The two placeholder paintings in `plates/` are drawn by `tools/make-placeholder.py`; bring your own with
-[the plate walkthrough](docs/make-a-plate.md). App icons are not included (they are the apps' own artwork): put 192 px
+Every screenshot above is the [quick-start](#quick-start-no-tv-needed) demo in headless Chromium. `plates/` holds
+two paintings with clean rights (see [credits](#credits)) and two placeholder scenes drawn by
+`tools/make-placeholder.py`; bring your own with [the plate walkthrough](docs/make-a-plate.md). App icons are not included (they are the apps' own artwork): put 192 px
 `.webp` files in `icons/tv/` named after the app ids in `tv-setup.html`, or leave them out and each tile shows its
 letter.
 
@@ -185,19 +211,6 @@ Built on a Xiaomi Google TV; `tv-apply.mjs` also knows the older PatchWall launc
 See [docs/make-a-plate.md](docs/make-a-plate.md): from any landscape image to the four layers in one command, then one
 line in `tv-setup.html`.
 
-## How it fits together
-
-```
- hub/server.mjs  (one always-on computer, port 8790, LAN and loopback only, zero dependencies)
-   ├─ serves tv-setup.html and plates/
-   ├─ /api/config        the one configuration (hub/state/config.json, with history)
-   ├─ /api/events        server-sent events: config, buses, batteries, wearables, Claude limits, music
-   ├─ /api/tv/*          the TV's state, and on/off (adb, Wake-on-LAN, Cast), behind tools/tv-guard.mjs
-   └─ readers            LTA buses, ICS calendar, NEA weather, phones over adb, Claude limits
- TV  dev.designyourtv: the screensaver, a Wallpaper tile, the Home key service and the music, inputs and app screens;
-     an offline copy of the page shows whenever the hub doesn't answer
-```
-
 ## Built on CleanYourTV's findings
 
 [CleanYourTV](https://github.com/Gathin23/cleanyourtv) (MIT, by Gathin) is the backend reference for this project:
@@ -235,6 +248,15 @@ node tools/tv-apply.mjs --selftest                   # tv-apply against an in-pr
   serial and model so a phone on the same adb server is never touched. The hub's TV keeper only ever talks to the
   TV's own serial.
 - The repository was swept for secrets and personal data before publishing: [docs/security-sweep.md](docs/security-sweep.md).
+
+## Credits
+
+The two F-22 paintings in `plates/` and the screenshots are oil-paint repaints, made with an image model, of
+public-domain U.S. Air Force photos on Wikimedia Commons:
+[F-22 Raptors over Alaska](https://commons.wikimedia.org/wiki/File:F-22_Raptor_pair_over_Alaska_-_081010-F-1234X-924.jpg)
+and [F-22 Raptor flying at twilight](https://commons.wikimedia.org/wiki/File:F-22_Raptor_flying_at_twilight_190728-F-VA182-1014.jpg)
+(U.S. Air Force photo by 2nd Lt. Samuel Eckholm). No endorsement by the U.S. Air Force is implied. The demo's music
+card names Debussy's *Clair de lune*, a public-domain work, as sample data.
 
 ## Licence
 

@@ -1917,8 +1917,11 @@ textarea::placeholder, input::placeholder { color: #666b73; }
    ink: the clock colour sampled from the painting. mode: "dark" when the ink is dark (a bright painting).
    off: true starts it as Remove (the owner can restore it). */
 const PLATES = [
-  // Two scenes drawn by tools/make-placeholder.py so the page runs out of the box. Bring your own paintings: make the
-  // layers with tools/depth_pipeline.py (docs/make-a-plate.md) and add one line each here.
+  // Two paintings with clean rights, so the page runs out of the box: oil-paint repaints, made with an image model, of
+  // public-domain U.S. Air Force photos (credits in the README), then two scenes drawn by tools/make-placeholder.py.
+  // Bring your own: make the layers with tools/depth_pipeline.py (docs/make-a-plate.md) and add one line each here.
+  {id:"f22-alaska", name:"Raptors over Alaska", mine:false, ink:"#3c3434", mode:"dark", face:"serif", sugg:{depth:"subj"}},
+  {id:"f22-thunderhead", name:"F-22 against the thunderhead", mine:false, ink:"#3c3027", mode:"dark", face:"serif", sugg:{depth:"subj"}},
   {id:"placeholder", name:"Valley at dusk", mine:true, ink:"#f3e3c4", mode:"light", face:"tall"},
   {id:"placeholder-dawn", name:"Valley at dawn", mine:true, ink:"#2b2f33", mode:"dark", face:"serif"},
 ];

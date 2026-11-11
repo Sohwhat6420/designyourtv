@@ -1,7 +1,10 @@
-# Art: bring your own. Only the placeholder plates drawn by tools/make-placeholder.py are published.
+# Art: bring your own. Published plates: the placeholders drawn by tools/make-placeholder.py, and the two F-22
+# repaints of public-domain U.S. Air Force photos the demo opens on (see Credits in the README).
 plates/*
 !plates/placeholder.*
 !plates/placeholder-dawn.*
+!plates/f22-alaska.*
+!plates/f22-thunderhead.*
 plates-4k/
 masters/
 refs/
