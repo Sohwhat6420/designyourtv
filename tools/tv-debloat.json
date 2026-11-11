@@ -1,0 +1,1971 @@
+{
+  "$comment": "Debloat data for tools/tv-apply.mjs. Only tier 'safe' applies without a flag; 'probably safe' needs --tier probably; 'risky' needs --tier risky AND --only <pkg>; a package with 'ask' needs --only <pkg> (the owner's answer first). 'keep' and 'protected' are refused whatever the flags, and tv-apply.mjs has its own hard-coded never-touch list. Installed packages not listed here are reported, never touched. Built 3 Nov 2026 from the sources below; nothing here has been run on the owner's TV yet.",
+  "version": 2,
+  "built": "2026-11-03",
+  "sources": {
+    "cyt": {
+      "title": "CleanYourTV per-model lists, 43 Xiaomi/Redmi folders (MIT), commit 572ce2c of 2 Nov 2026",
+      "url": "https://github.com/Gathin23/cleanyourtv/tree/572ce2cbe98b53654cea3d262ee8558a5872dfd1/examples"
+    },
+    "cyt-a-pro-2026": {
+      "title": "CleanYourTV: Xiaomi TV A Pro 2026 (MiTV-MZTU0, SG set), Google TV 14",
+      "url": "https://github.com/Gathin23/cleanyourtv/blob/572ce2cbe98b53654cea3d262ee8558a5872dfd1/examples/xiaomi-tv-a-pro-2026/debloat.txt"
+    },
+    "cyt-guard": {
+      "title": "CleanYourTV tools/disable.sh guards (core packages, Home, TV inputs, setupwraith Wi-Fi owner)",
+      "url": "https://github.com/Gathin23/cleanyourtv/blob/572ce2cbe98b53654cea3d262ee8558a5872dfd1/tools/disable.sh"
+    },
+    "uad": {
+      "title": "Universal Android Debloater (next generation) uad_lists.json, commit e1fff1e of 2 Nov 2026",
+      "url": "https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation/blob/e1fff1efa87c54611b52771a31a03f408712deec/resources/assets/uad_lists.json"
+    },
+    "r-185xsd5": {
+      "title": "r/MiBox: Mi Box S 2nd Gen debloat list (survived updates)",
+      "url": "https://www.reddit.com/r/MiBox/comments/185xsd5/"
+    },
+    "r-1vq3t87": {
+      "title": "r/AndroidTV: Xiaomi box debloat walkthrough",
+      "url": "https://www.reddit.com/r/AndroidTV/comments/1vq3t87/"
+    },
+    "r-1d1guk4": {
+      "title": "r/AndroidTV: Xiaomi debloat package thread",
+      "url": "https://www.reddit.com/r/AndroidTV/comments/1d1guk4/"
+    },
+    "r-147vwns": {
+      "title": "r/AndroidTV: Xiaomi auto-install configs and PatchWall",
+      "url": "https://www.reddit.com/r/AndroidTV/comments/147vwns/"
+    },
+    "r-1w47d49": {
+      "title": "r/MiBox: Projectivy, then disable the Google TV launcher and remove PatchWall / Xiaomi TV+, animations 0.5x",
+      "url": "https://www.reddit.com/r/MiBox/comments/1w47d49/"
+    },
+    "r-1xfa2ka": {
+      "title": "r/AndroidTV 25 Oct 2026: Mi TV 4A boot loop after disabling com.android.tv.settings (unrecovered)",
+      "url": "https://www.reddit.com/r/AndroidTV/comments/1xfa2ka/"
+    },
+    "r-1ryw9bs": {
+      "title": "r/AndroidTV: Mi TV 4A reboot loop after uninstalling Play Store updates / clearing Play Store data / uninstalling PatchWall; factory reset did not fix it",
+      "url": "https://www.reddit.com/r/AndroidTV/comments/1ryw9bs/"
+    },
+    "r-1koz621": {
+      "title": "r/AndroidTV PSA: disabling com.mitv.livetv kills HDMI inputs and picture/sound settings",
+      "url": "https://www.reddit.com/r/AndroidTV/comments/1koz621/"
+    },
+    "r-1wljxdb": {
+      "title": "r/MiBox: removing Bluetooth froze the box",
+      "url": "https://www.reddit.com/r/MiBox/comments/1wljxdb/"
+    },
+    "r-1nu69a1": {
+      "title": "r/AndroidTV: launcher disabled with no replacement, black screen",
+      "url": "https://www.reddit.com/r/AndroidTV/comments/1nu69a1/"
+    },
+    "r-1xgbhem": {
+      "title": "r/AndroidTV: debloat script incl. ambient screensaver (dreamx) and katniss",
+      "url": "https://www.reddit.com/r/AndroidTV/comments/1xgbhem/"
+    },
+    "r-1ik0r3x": {
+      "title": "r/AndroidTV: Google TV debloat list discussion (tvrecommendations, backdrop, katniss, mediashell)",
+      "url": "https://www.reddit.com/r/AndroidTV/comments/1ik0r3x/"
+    },
+    "r-1k9gfpx": {
+      "title": "r/AndroidTV: Android TV Debloat Toolkit thread (launcherx and casting)",
+      "url": "https://www.reddit.com/r/AndroidTV/comments/1k9gfpx/"
+    },
+    "r-1rhi68r": {
+      "title": "r/AndroidTV: casting path, mediashell binds YouTube TV's cast service",
+      "url": "https://www.reddit.com/r/AndroidTV/comments/1rhi68r/"
+    },
+    "web-tvfresh": {
+      "title": "tv-fresh wiki (Chinese): disables com.mitv.tvhome and, to fix the fallback, com.android.tv.settings. DO NOT FOLLOW the second step (boot loop, r-1xfa2ka)",
+      "url": "https://github.com/wangrongding/tv-fresh/wiki"
+    },
+    "web-mustafa": {
+      "title": "mustafa.net 30 Oct 2026: remove Google TV home ads (michannel, mitvplus, oemtab, statistic; leaves tvhome.atv)",
+      "url": "https://mustafa.net/2026/10/30/remove-google-tv-home-screen-ads/"
+    },
+    "digest": {
+      "title": "Our 2 Nov digest (r/AndroidTV 2021-2026, r/MiBox, r/Xiaomi, r/GoogleTV, r/Projectivy_Launcher)",
+      "url": "../../reddit-research/runs/2026-11-02-xiaomi-tv/DIGEST.md"
+    },
+    "refs": {
+      "title": "Our 3 Nov references, section 4 (keep-working packages)",
+      "url": "../research/references-2026-11-03.md"
+    }
+  },
+  "protected": [
+    {
+      "re": "^(android|android\\.ext\\.(services|shared))$",
+      "why": "core Android",
+      "source": "cyt-guard"
+    },
+    {
+      "re": "^com\\.android\\.(systemui|shell|phone|settings|tv\\.settings|sdksandbox|location\\.fused|keychain|inputdevices|externalstorage|certinstaller|networkstack.*|wifi.*|bluetooth|nfc|server\\..*|providers\\..*|permissioncontroller|packageinstaller|ext\\.services|ext\\.shared|modulemetadata|tv|webview|inputmethod\\..*|managedprovisioning|provision|vpndialogs|captiveportallogin|cellbroadcast.*|media.*|traceur|statementservice|storagemanager|documentsui|intentresolver|uwb.*|virtualmachine.*|devicelockcontroller|rkpdapp)$",
+      "why": "core Android: boot, settings, network, Bluetooth, installer, providers, input, WebView, media",
+      "source": "cyt-guard"
+    },
+    {
+      "re": "^com\\.google\\.android\\.(gms|gsf|gms\\..*|ext\\.services|ext\\.shared|permissioncontroller|packageinstaller|modulemetadata|overlay\\.modules.*|networkstack.*|wifi.*|bluetooth|webview|trichromelibrary.*|inputmethod\\..*|leanback\\.ime|tts|tv\\.axel|tv\\.dfuservice|tv\\.remotecontrol\\..*|apps\\.tv\\.remotecontrol.*|tv\\.frameworkpackagestubs|configupdater|captiveportallogin|cellbroadcast.*|documentsui|mediaprovider|media.*|providers\\..*|sdksandbox|rkpdapp|adservices\\.api\\.overlay.*)$",
+      "why": "Play services, framework, WebView, keyboards, the remote's IR and update services",
+      "source": "uad"
+    },
+    {
+      "re": "^com\\.android\\.vending$",
+      "why": "Play Store (never clear its data or uninstall its updates: r/AndroidTV 1ryw9bs)",
+      "source": "r-1ryw9bs"
+    },
+    {
+      "re": "^com\\.(mitv\\.livetv.*|mediatek\\.(tvinput|tis|tv\\.service|tv\\.agent|extservice|hotkey\\.dispatcher|network|wwtv\\.tvcenter|wwtv\\.setupwizard|tvcenter.*)|droidlogic.*|cltv\\.mal|android\\.providers\\.tv)$",
+      "why": "TV tuner, HDMI inputs, picture and sound settings, Source key",
+      "source": "r-1koz621"
+    },
+    {
+      "re": "^(mitv\\.service|com\\.mitv\\.overseaservice|com\\.mi\\.bluetooth|com\\.mitv\\.setup|com\\.xiaomi\\.android\\.tvsetup\\.partnercustomizer|com\\.xiaomi\\.mitv\\.scenemode|com\\.xiaomi\\.mitv\\.settings|com\\.xiaomi\\.gtv\\.settings|com\\.xiaomi\\.mitv\\.res|com\\.mitv\\.bspfactoryservice|com\\.fengmi\\..*)$",
+      "why": "Xiaomi remote keys, BT remote pairing, setup, game mode, Xiaomi's settings app",
+      "source": "cyt"
+    }
+  ],
+  "keep": [
+    {
+      "pkg": "com.google.android.tv.remote.service",
+      "why": "Google TV remote in the Google Home / Google TV phone app (the owner's ask)"
+    },
+    {
+      "pkg": "com.google.android.apps.mediashell",
+      "why": "Chromecast built-in (the owner's ask; YouTube Music casting lands here)"
+    },
+    {
+      "pkg": "com.xiaomi.mitv.smartshare",
+      "why": "Miracast + MiPlay + AirPlay receiver (the owner's ask: screen mirroring)"
+    },
+    {
+      "pkg": "com.xiaomi.wfdsinkhelperservice",
+      "why": "Miracast sink helper (the owner's ask)"
+    },
+    {
+      "pkg": "com.mitv.milinkservice",
+      "why": "Mi Cast / MiLink (mirroring)"
+    },
+    {
+      "pkg": "com.xiaomi.miplay",
+      "why": "MiPlay (Xiaomi phone casting; the POCO)"
+    },
+    {
+      "pkg": "com.duokan.airkan.tvbox",
+      "why": "AirKan casting / DLNA"
+    },
+    {
+      "pkg": "com.xiaomi.mi_connect_service",
+      "why": "Mi Connect (casting discovery)"
+    },
+    {
+      "pkg": "com.mitv.videoplayer",
+      "why": "plays MiLink-cast video"
+    },
+    {
+      "pkg": "com.mediatek.AirplayAPK",
+      "why": "MediaTek AirPlay"
+    },
+    {
+      "pkg": "com.google.android.youtube.tvmusic",
+      "why": "YouTube Music: in the owner's dock and the likely target of casts from the phone app"
+    },
+    {
+      "pkg": "com.google.android.youtube.tv",
+      "why": "YouTube: in the owner's dock; casting binds to its cast service"
+    },
+    {
+      "pkg": "com.netflix.ninja",
+      "why": "Netflix: in the owner's dock (the firmware re-enables it anyway)"
+    },
+    {
+      "pkg": "com.amazon.amazonvideo.livingroom",
+      "why": "Prime Video: in the owner's dock"
+    },
+    {
+      "pkg": "com.disney.disneyplus",
+      "why": "Disney+: in the owner's dock"
+    },
+    {
+      "pkg": "com.spotify.tv.android",
+      "why": "Spotify: can be added to the owner's dock"
+    },
+    {
+      "pkg": "com.netflix.tokenmanager",
+      "why": "Netflix sign-in"
+    },
+    {
+      "pkg": "com.mstar.netflixobserver",
+      "why": "the remote's Netflix button"
+    },
+    {
+      "pkg": "com.xiaomi.mitv.updateservice",
+      "why": "firmware updates (security patches)"
+    },
+    {
+      "pkg": "com.mitv.upgrader",
+      "why": "firmware updates"
+    },
+    {
+      "pkg": "com.xiaomi.mitv.upgrade",
+      "why": "firmware updates"
+    },
+    {
+      "pkg": "com.mediatek.tv.systemupdater",
+      "why": "firmware updates"
+    },
+    {
+      "pkg": "com.mitv.ABUpdateStatus",
+      "why": "firmware update status"
+    },
+    {
+      "pkg": "com.google.android.syncadapters.calendar",
+      "why": "calendar sync (the Claude app can read calendars)"
+    }
+  ],
+  "settings": [
+    {
+      "ns": "global",
+      "key": "window_animation_scale",
+      "value": "0.5",
+      "tier": "safe",
+      "reason": "menus feel snappier (developer options)",
+      "sources": [
+        "digest",
+        "r-1w47d49"
+      ]
+    },
+    {
+      "ns": "global",
+      "key": "transition_animation_scale",
+      "value": "0.5",
+      "tier": "safe",
+      "reason": "same",
+      "sources": [
+        "digest"
+      ]
+    },
+    {
+      "ns": "global",
+      "key": "animator_duration_scale",
+      "value": "0.5",
+      "tier": "safe",
+      "reason": "same; 0.5 not 0, since some apps time things off animator scale",
+      "sources": [
+        "digest"
+      ]
+    }
+  ],
+  "packages": [
+    {
+      "pkg": "com.miui.tv.analytics",
+      "name": "Xiaomi TV analytics",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "usage statistics upload",
+      "breaks": "nothing reported",
+      "evidence": {
+        "cytActiveLists": 39,
+        "cytCommentedLists": 0,
+        "uad": "Recommended: Analytics Weird analytics app with a lot random stuff found in resources."
+      },
+      "sources": [
+        "cyt",
+        "uad",
+        "r-185xsd5",
+        "r-1vq3t87"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.statistic",
+      "name": "Xiaomi statistics uploader",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "statistics upload",
+      "breaks": "nothing reported",
+      "evidence": {
+        "cytActiveLists": 33,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt",
+        "web-mustafa"
+      ]
+    },
+    {
+      "pkg": "com.miui.analytics",
+      "name": "Xiaomi OneTrack analytics host",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "analytics SDK host",
+      "breaks": "nothing reported",
+      "evidence": {
+        "cytActiveLists": 6,
+        "cytCommentedLists": 0,
+        "uad": "Recommended: Xiaomi Analytics This app is shady. According to a guy who tried to reverse engineer the app, Xiaomi Analytics can replace any (signed?) pac"
+      },
+      "sources": [
+        "cyt",
+        "uad"
+      ]
+    },
+    {
+      "pkg": "com.google.android.feedback",
+      "name": "Google feedback",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "crash and feedback reports",
+      "breaks": "the 'send feedback' screens",
+      "evidence": {
+        "cytActiveLists": 30,
+        "cytCommentedLists": 1,
+        "uad": "Recommended: This is the package that sends crash-report feedback to the Play Store? The crash pop-up still happens with this disabled. Doesn't seem to r"
+      },
+      "sources": [
+        "cyt",
+        "uad"
+      ]
+    },
+    {
+      "pkg": "com.google.android.tv.bugreportsender",
+      "name": "Bug report sender",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "automatic bug report upload",
+      "breaks": "nothing reported",
+      "evidence": {
+        "cytActiveLists": 11,
+        "cytCommentedLists": 0,
+        "uad": "Recommended: BugReportSender Bug reports app."
+      },
+      "sources": [
+        "cyt",
+        "uad"
+      ]
+    },
+    {
+      "pkg": "tv.alphonso.alphonso_eula",
+      "name": "Alphonso ad tracking",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "ad tracking from viewing data",
+      "breaks": "nothing reported",
+      "evidence": {
+        "cytActiveLists": 3,
+        "cytCommentedLists": 0,
+        "uad": "Recommended: Alphonso Recommendations Enhanced viewing, personalized experience of watching TV."
+      },
+      "sources": [
+        "cyt",
+        "uad"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.mitv.csi",
+      "name": "After-sales assistant",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "satisfaction-survey upload",
+      "breaks": "nothing reported",
+      "evidence": {
+        "cytActiveLists": 3,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.tvqs",
+      "name": "Xiaomi quality system",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "uploads crash/performance entries",
+      "breaks": "nothing reported; model-dependent",
+      "evidence": {
+        "cytActiveLists": 7,
+        "cytCommentedLists": 2
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.tvqs.overseas.y24",
+      "name": "Xiaomi quality stats (2024+ sets)",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "quality-stats uploader",
+      "breaks": "nothing reported on the A Pro 2026",
+      "evidence": {
+        "cytActiveLists": 4,
+        "cytCommentedLists": 1
+      },
+      "sources": [
+        "cyt",
+        "cyt-a-pro-2026"
+      ]
+    },
+    {
+      "pkg": "com.miui.misightservice",
+      "name": "MiSight remote diagnostics",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "remote diagnostics and log upload",
+      "breaks": "nothing reported (1 list)",
+      "evidence": {
+        "cytActiveLists": 1,
+        "cytCommentedLists": 0,
+        "uad": "Recommended: Telemetry and diagnostics collector app that sends analytics to Xiaomi servers and has almost no use for user. Something on the level of com"
+      },
+      "sources": [
+        "cyt",
+        "uad"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.mitv.debug",
+      "name": "Xiaomi debug log service",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "log collection",
+      "breaks": "nothing reported (1 list)",
+      "evidence": {
+        "cytActiveLists": 1,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.mediatek.TimeMeasurementAgent",
+      "name": "MediaTek timing agent",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "diagnostics",
+      "breaks": "nothing; may stay resident",
+      "evidence": {
+        "cytActiveLists": 1,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.android.tv.feedbackconsent",
+      "name": "Feedback consent prompt",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "feedback plumbing",
+      "breaks": "nothing reported",
+      "evidence": {
+        "cytActiveLists": 4,
+        "cytCommentedLists": 1
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.google.android.partnersetup",
+      "name": "Google partner setup (RLZ)",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "attribution pings",
+      "breaks": "nothing reported",
+      "evidence": {
+        "cytActiveLists": 9,
+        "cytCommentedLists": 2,
+        "uad": "Advanced: Google Partner Setup Occasionally runs in the background. Based on an unclear explanation online:\"Enables applications to interact with your"
+      },
+      "sources": [
+        "cyt",
+        "uad"
+      ]
+    },
+    {
+      "pkg": "com.mitv.tvhome.michannel",
+      "name": "Mi Channels (PatchWall rows)",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "recommendation and ad rows",
+      "breaks": "PatchWall's channel rows",
+      "evidence": {
+        "cytActiveLists": 23,
+        "cytCommentedLists": 0,
+        "uad": "Recommended: Mi Channel Same app like a PatchWall."
+      },
+      "sources": [
+        "cyt",
+        "uad",
+        "r-185xsd5",
+        "web-mustafa"
+      ]
+    },
+    {
+      "pkg": "com.mitv.tvhome.mitvplus",
+      "name": "Xiaomi TV+ (FAST channels)",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "ad-funded channels; the 'keeps reinstalling' button",
+      "breaks": "the Xiaomi TV+ button",
+      "evidence": {
+        "cytActiveLists": 23,
+        "cytCommentedLists": 1
+      },
+      "sources": [
+        "cyt",
+        "r-185xsd5",
+        "r-1w47d49",
+        "web-mustafa"
+      ]
+    },
+    {
+      "pkg": "com.mitv.tvhome.oemtab",
+      "name": "'Mi Home' tab in Google TV",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "Xiaomi ad row injected into the Google TV home",
+      "breaks": "that tab",
+      "evidence": {
+        "cytActiveLists": 10,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt",
+        "cyt-a-pro-2026",
+        "web-mustafa"
+      ]
+    },
+    {
+      "pkg": "com.xm.webcontent",
+      "name": "Xiaomi web content",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "promo web-content renderer; also fetches screensaver ads",
+      "breaks": "UAD rates it Expert: shows 'App installing' messages and is a web view; CYT disables it on 39 of 43 lists",
+      "evidence": {
+        "cytActiveLists": 39,
+        "cytCommentedLists": 0,
+        "uad": "Expert: WebContent Needed for messages like 'App installing'. Also WebView."
+      },
+      "sources": [
+        "cyt",
+        "uad"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.floatingframe",
+      "name": "Floating promo frame",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "promo overlay service",
+      "breaks": "nothing reported",
+      "evidence": {
+        "cytActiveLists": 10,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.glance.tv",
+      "name": "Glance (lock-screen news and ads)",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "news and ads on the standby screen",
+      "breaks": "nothing the owner uses",
+      "evidence": {
+        "cytActiveLists": 1,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt",
+        "digest"
+      ]
+    },
+    {
+      "pkg": "co.sensara.tv.mitv",
+      "name": "Sensara partner guide",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "sponsored show recommendations",
+      "breaks": "nothing the owner uses",
+      "evidence": {
+        "cytActiveLists": 3,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "co.sensara.tv.mitv.res",
+      "name": "Sensara resources",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "goes with the guide",
+      "breaks": "nothing",
+      "evidence": {
+        "cytActiveLists": 1,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.mitv.shoplugin",
+      "name": "TV shopping plugin",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "shopping SDK, two resident processes",
+      "breaks": "nothing",
+      "evidence": {
+        "cytActiveLists": 8,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.mitv.shop",
+      "name": "Xiaomi TV store",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "shopping",
+      "breaks": "nothing",
+      "evidence": {
+        "cytActiveLists": 6,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.mitv.tvpush.tvpushservice",
+      "name": "Xiaomi push service",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "push ads and notifications",
+      "breaks": "Xiaomi pop-ups",
+      "evidence": {
+        "cytActiveLists": 6,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.mitv.cloudcontrol",
+      "name": "Xiaomi cloud control",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "starts on connectivity and remotely pushes apps",
+      "breaks": "nothing reported",
+      "evidence": {
+        "cytActiveLists": 7,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.duokan.videodaily",
+      "name": "Video daily promos",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "promo videos",
+      "breaks": "nothing",
+      "evidence": {
+        "cytActiveLists": 6,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.gitvdemo.video",
+      "name": "GITV demo reel",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "promo demo",
+      "breaks": "nothing",
+      "evidence": {
+        "cytActiveLists": 2,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "fusion.android.tv.demo",
+      "name": "Retail store demo",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "store demo loop",
+      "breaks": "nothing",
+      "evidence": {
+        "cytActiveLists": 11,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "android.autoinstalls.config.xiaomi.amelie",
+      "name": "Partner auto-install config",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "silent partner-app installs",
+      "breaks": "nothing",
+      "evidence": {
+        "cytActiveLists": 14,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt",
+        "r-147vwns"
+      ]
+    },
+    {
+      "pkg": "android.autoinstalls.config.xioami.dangal",
+      "name": "Partner auto-install config (sic 'xioami')",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "silent partner-app installs",
+      "breaks": "nothing",
+      "evidence": {
+        "cytActiveLists": 7,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt",
+        "r-147vwns"
+      ]
+    },
+    {
+      "pkg": "android.autoinstalls.config.xioami.mibox3",
+      "name": "Partner auto-install config (sic)",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "silent partner-app installs",
+      "breaks": "nothing",
+      "evidence": {
+        "cytActiveLists": 5,
+        "cytCommentedLists": 0,
+        "uad": "Recommended: AutoInstalls a set of OEM apps on device setup (first boot/factory reset)."
+      },
+      "sources": [
+        "cyt",
+        "uad",
+        "r-185xsd5",
+        "r-147vwns"
+      ]
+    },
+    {
+      "pkg": "android.autoinstalls.config.xiaomi.mibox3",
+      "name": "Partner auto-install config",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "silent partner-app installs",
+      "breaks": "nothing",
+      "evidence": {
+        "cytActiveLists": 2,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "android.autoinstalls.config.google.gtvpai",
+      "name": "Google TV partner auto-installs",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "Play auto-install of partner apps",
+      "breaks": "nothing",
+      "evidence": {
+        "cytActiveLists": 2,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt",
+        "cyt-a-pro-2026"
+      ]
+    },
+    {
+      "pkg": "android.autoinstalls.config.soc.amlogic",
+      "name": "Amlogic partner auto-installs",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "silent installs",
+      "breaks": "nothing",
+      "evidence": {
+        "cytActiveLists": 3,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "android.autoinstalls.config.fomovie",
+      "name": "Partner auto-install config",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "silent installs",
+      "breaks": "nothing",
+      "evidence": {
+        "cytActiveLists": 2,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.mitv.hyper.screensaver",
+      "name": "HyperOS screensaver (ad carousel)",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "screensaver with ads",
+      "breaks": "the stock screensaver: set ours first",
+      "requires": "screensaver-replaced",
+      "evidence": {
+        "cytActiveLists": 2,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.mitv.tvmanager",
+      "name": "TV Manager (cleaner / booster)",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "background cleaner",
+      "breaks": "nothing",
+      "evidence": {
+        "cytActiveLists": 29,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt",
+        "r-1vq3t87"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.gamecenter.sdk.service.mibox",
+      "name": "Xiaomi game-centre SDK",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "game SDK service",
+      "breaks": "nothing",
+      "evidence": {
+        "cytActiveLists": 9,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.mitv.handbook",
+      "name": "User handbook",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "on-screen manual",
+      "breaks": "the manual",
+      "evidence": {
+        "cytActiveLists": 9,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.mitv.manualhelp",
+      "name": "On-screen user manual",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "manual",
+      "breaks": "the manual",
+      "evidence": {
+        "cytActiveLists": 5,
+        "cytCommentedLists": 1
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.screenrecorder",
+      "name": "Screen recorder",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "unused",
+      "breaks": "screen recording",
+      "evidence": {
+        "cytActiveLists": 7,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomo.tv.milegal",
+      "name": "Xiaomi legal screens (sic 'xiaomo')",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "terms / privacy viewer",
+      "breaks": "the legal pages in Settings",
+      "evidence": {
+        "cytActiveLists": 15,
+        "cytCommentedLists": 1
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.mitv.legal.webview",
+      "name": "Terms and privacy viewer",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "terms viewer",
+      "breaks": "the legal pages",
+      "evidence": {
+        "cytActiveLists": 2,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.mitv.toolhouse",
+      "name": "Xiaomi tool box",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "tool box app",
+      "breaks": "that app",
+      "evidence": {
+        "cytActiveLists": 8,
+        "cytCommentedLists": 1
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.mitv.karaoke.service",
+      "name": "Karaoke service",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "unused feature",
+      "breaks": "karaoke",
+      "evidence": {
+        "cytActiveLists": 5,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.mitv.tvvideocall",
+      "name": "MiTime video calls",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "unused feature",
+      "breaks": "video calls",
+      "evidence": {
+        "cytActiveLists": 1,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.aitranslate",
+      "name": "AI subtitle translation",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "~117 MB resident on one set",
+      "breaks": "AI subtitles",
+      "evidence": {
+        "cytActiveLists": 1,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.mitv.light",
+      "name": "Light-effect app",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "unused feature",
+      "breaks": "that feature",
+      "evidence": {
+        "cytActiveLists": 1,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.mitv.healthdiagnosis",
+      "name": "TV self-diagnosis",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "unused",
+      "breaks": "self-diagnosis",
+      "evidence": {
+        "cytActiveLists": 4,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.mitv.health",
+      "name": "MiHealth",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "unused",
+      "breaks": "that app",
+      "evidence": {
+        "cytActiveLists": 3,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.amazon.alexa",
+      "name": "Alexa bridge",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "unused (the owner uses Google)",
+      "breaks": "Alexa control of the TV",
+      "evidence": {
+        "cytActiveLists": 5,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.smarthome.tv",
+      "name": "Mi Home (smart home)",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "unused",
+      "breaks": "Mi Home control; the remote's voice button kept working",
+      "evidence": {
+        "cytActiveLists": 6,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.mitv.smartpanel",
+      "name": "Smart-home panel",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "unused",
+      "breaks": "the smart panel",
+      "evidence": {
+        "cytActiveLists": 4,
+        "cytCommentedLists": 1
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.mitv.tvlock",
+      "name": "TV lock / parental password",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "unused",
+      "breaks": "the child lock",
+      "evidence": {
+        "cytActiveLists": 5,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.mibox.lockscreen",
+      "name": "Child lock screen",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "unused",
+      "breaks": "the child lock",
+      "evidence": {
+        "cytActiveLists": 2,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.mitv.calendar",
+      "name": "Xiaomi calendar",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "unused (our page has the calendar)",
+      "breaks": "that app",
+      "evidence": {
+        "cytActiveLists": 6,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.tweather",
+      "name": "Xiaomi weather",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "unused",
+      "breaks": "that app",
+      "evidence": {
+        "cytActiveLists": 5,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.mitv.alarmcenter",
+      "name": "Alarms",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "unused",
+      "breaks": "TV alarms",
+      "evidence": {
+        "cytActiveLists": 3,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.mstar.android.tv.disclaimercustomization",
+      "name": "Disclaimer screen",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "first-run disclaimer",
+      "breaks": "nothing",
+      "evidence": {
+        "cytActiveLists": 4,
+        "cytCommentedLists": 2
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "mediatek.factorymenu.ui",
+      "name": "Factory menu",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "factory tool, never launched",
+      "breaks": "the factory menu",
+      "evidence": {
+        "cytActiveLists": 3,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.duokan.factorytest",
+      "name": "Factory test (claims HOME at priority 0)",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "disabling it means Home can never land on the factory test screen",
+      "breaks": "the factory test",
+      "evidence": {
+        "cytActiveLists": 2,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.eetv.litehome",
+      "name": "Office-mode second home",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "a second home screen",
+      "breaks": "office mode",
+      "evidence": {
+        "cytActiveLists": 1,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.mimusic2",
+      "name": "Mi Music",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "preloaded music app (the owner uses YouTube Music)",
+      "breaks": "Mi Music, USB music via it",
+      "evidence": {
+        "cytActiveLists": 27,
+        "cytCommentedLists": 1
+      },
+      "sources": [
+        "cyt",
+        "r-185xsd5"
+      ],
+      "ask": "USB drives: does the owner play music from a USB stick?"
+    },
+    {
+      "pkg": "com.google.android.play.games",
+      "name": "Play Games",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "preloaded",
+      "breaks": "Play Games",
+      "evidence": {
+        "cytActiveLists": 24,
+        "cytCommentedLists": 3,
+        "uad": "Recommended: Google Play Games (https://play.google.com/store/apps/details?id=com.google.android.play.games) "
+      },
+      "sources": [
+        "cyt",
+        "uad",
+        "r-185xsd5"
+      ]
+    },
+    {
+      "pkg": "com.google.android.apps.tachyon",
+      "name": "Google Duo",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "dead app",
+      "breaks": "nothing",
+      "evidence": {
+        "cytActiveLists": 2,
+        "cytCommentedLists": 0,
+        "uad": "Recommended: Google Duo (Video Calls) (https://play.google.com/store/apps/details?id=com.google.android.apps.tachyon) "
+      },
+      "sources": [
+        "cyt",
+        "uad"
+      ]
+    },
+    {
+      "pkg": "com.google.android.music",
+      "name": "Google Play Music",
+      "tier": "safe",
+      "action": "disable",
+      "reason": "service closed in 2020",
+      "breaks": "nothing",
+      "evidence": {
+        "cytActiveLists": 2,
+        "cytCommentedLists": 1,
+        "uad": "Recommended: Google Play Music (discontinued) (https://play.google.com/store/apps/details?id=com.google.android.music)"
+      },
+      "sources": [
+        "cyt",
+        "uad"
+      ]
+    },
+    {
+      "pkg": "com.google.android.videos",
+      "name": "Play Movies & TV / Google TV shop",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "preloaded",
+      "breaks": "buying or renting films on the TV",
+      "evidence": {
+        "cytActiveLists": 17,
+        "cytCommentedLists": 5,
+        "uad": "Recommended: Google TV (previously Google Play Movies & TV) (https://play.google.com/store/apps/details?id=com.google.android.videos)"
+      },
+      "sources": [
+        "cyt",
+        "uad"
+      ]
+    },
+    {
+      "pkg": "com.google.android.youtube.tvkids",
+      "name": "YouTube Kids",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "preloaded",
+      "breaks": "YouTube Kids",
+      "evidence": {
+        "cytActiveLists": 3,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomi.tv.gallery",
+      "name": "Mi photo album",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "preloaded",
+      "breaks": "the album",
+      "evidence": {
+        "cytActiveLists": 6,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.mitv.gallery",
+      "name": "Mi gallery",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "photo album",
+      "breaks": "USB photos (Media player opens photos with it on the 55\" A Pro)",
+      "evidence": {
+        "cytActiveLists": 22,
+        "cytCommentedLists": 2
+      },
+      "sources": [
+        "cyt",
+        "cyt-a-pro-2026"
+      ],
+      "ask": "USB drives: does the owner play photos or videos from a USB stick?"
+    },
+    {
+      "pkg": "com.xiaomi.mitv.mediaexplorer",
+      "name": "USB media player",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "USB player",
+      "breaks": "playing USB drives",
+      "evidence": {
+        "cytActiveLists": 7,
+        "cytCommentedLists": 3
+      },
+      "sources": [
+        "cyt",
+        "r-185xsd5"
+      ],
+      "ask": "USB drives: does the owner play photos or videos from a USB stick?"
+    },
+    {
+      "pkg": "com.google.android.marvin.talkback",
+      "name": "TalkBack screen reader",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "accessibility service the owner doesn't use",
+      "breaks": "the screen reader",
+      "evidence": {
+        "cytActiveLists": 8,
+        "cytCommentedLists": 3,
+        "uad": "Advanced: Android Accessibility Suite (https://play.google.com/store/apps/details?id=com.google.android.marvin.talkback) Helps blind and visually impa"
+      },
+      "sources": [
+        "cyt",
+        "uad"
+      ]
+    },
+    {
+      "pkg": "com.android.printspooler",
+      "name": "Print spooler",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "no printer on a TV",
+      "breaks": "printing",
+      "evidence": {
+        "cytActiveLists": 12,
+        "cytCommentedLists": 2,
+        "uad": "Expert: Print Spooler Manages the printing process. Runs on boot, but not beyond that. WARNING: Disabling breaks the connection preferences submenu "
+      },
+      "sources": [
+        "cyt",
+        "uad"
+      ]
+    },
+    {
+      "pkg": "com.android.smspush",
+      "name": "SMS push",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "no SIM on a TV",
+      "breaks": "nothing",
+      "evidence": {
+        "cytActiveLists": 4,
+        "cytCommentedLists": 0,
+        "uad": "Advanced: This service is used to push/send specially formatted SMS messages that display an alert message to the user, and give them the option of co"
+      },
+      "sources": [
+        "cyt",
+        "uad"
+      ]
+    },
+    {
+      "pkg": "com.android.wallpaperbackup",
+      "name": "Wallpaper backup agent",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "no phone wallpaper",
+      "breaks": "nothing",
+      "evidence": {
+        "cytActiveLists": 3,
+        "cytCommentedLists": 1,
+        "uad": "Advanced: Wallpaper Backup Backs up and restores wallpaper and metadata related to it. This agent has its own package because it does full backup as o"
+      },
+      "sources": [
+        "cyt",
+        "uad"
+      ]
+    },
+    {
+      "pkg": "com.android.backupconfirm",
+      "name": "Backup confirm",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "plumbing",
+      "breaks": "local backup prompt",
+      "evidence": {
+        "cytActiveLists": 3,
+        "cytCommentedLists": 0,
+        "uad": "Expert: Restores Google settings with Google Backup restore. Displays confirmation popup when doing ADB backup. Disabling this package breaks ADB Ba"
+      },
+      "sources": [
+        "cyt",
+        "uad"
+      ]
+    },
+    {
+      "pkg": "com.android.sharedstoragebackup",
+      "name": "Shared-storage backup",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "plumbing",
+      "breaks": "nothing",
+      "evidence": {
+        "cytActiveLists": 3,
+        "cytCommentedLists": 0,
+        "uad": "Advanced: Used during backup. Backs up the shared storage? (files accessible by every app with STORAGE permission) Things have changed with Android 10"
+      },
+      "sources": [
+        "cyt",
+        "uad"
+      ]
+    },
+    {
+      "pkg": "com.google.android.onetimeinitializer",
+      "name": "One-time initialiser",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "first-setup task that runs at boot",
+      "breaks": "nothing",
+      "evidence": {
+        "cytActiveLists": 1,
+        "cytCommentedLists": 1,
+        "uad": "Recommended: Provides first time setup, safe to remove. "
+      },
+      "sources": [
+        "cyt",
+        "uad"
+      ]
+    },
+    {
+      "pkg": "com.discoveryplus.mitv",
+      "name": "discovery+ (partner copy)",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "region preload",
+      "breaks": "that app",
+      "evidence": {
+        "cytActiveLists": 2,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.graymatrix.did",
+      "name": "ZEE5",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "region preload",
+      "breaks": "that app",
+      "evidence": {
+        "cytActiveLists": 2,
+        "cytCommentedLists": 3
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.zee5.xiaomiTV",
+      "name": "ZEE5 (old partner copy)",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "region preload",
+      "breaks": "that app",
+      "evidence": {
+        "cytActiveLists": 1,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.xiaomitv.sonyliv",
+      "name": "SonyLIV (old partner copy)",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "region preload",
+      "breaks": "that app",
+      "evidence": {
+        "cytActiveLists": 2,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.eros.mitv",
+      "name": "Eros Now",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "region preload",
+      "breaks": "that app",
+      "evidence": {
+        "cytActiveLists": 1,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.suntv.sunnxt.mitv",
+      "name": "Sun NXT",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "region preload",
+      "breaks": "that app",
+      "evidence": {
+        "cytActiveLists": 1,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.aha.mitv",
+      "name": "Aha (duplicate)",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "region preload",
+      "breaks": "that app",
+      "evidence": {
+        "cytActiveLists": 1,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.google.android.tvrecommendations",
+      "name": "Android TV recommendations",
+      "tier": "risky",
+      "action": "disable",
+      "reason": "recommendation and ad rows",
+      "breaks": "UAD rates it Expert: on some TVs it carries framework pieces; rows on the stock home; UAD rates it Expert (on some TVs it carries framework pieces the home screen uses); held back to --tier risky --only",
+      "evidence": {
+        "cytActiveLists": 19,
+        "cytCommentedLists": 1,
+        "uad": "Expert: Android TV Core Services Sometimes has only Notification to Android11UpgradeReceiver, and on some TV's has a lot frameworks, it's weird. htt"
+      },
+      "sources": [
+        "cyt",
+        "uad",
+        "r-1ik0r3x"
+      ],
+      "disableOnly": true
+    },
+    {
+      "pkg": "com.google.android.leanbacklauncher.recommendations",
+      "name": "Leanback recommendations",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "recommendation rows",
+      "breaks": "rows on the old stock home",
+      "evidence": {
+        "cytActiveLists": 9,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.google.android.backdrop",
+      "name": "Ambient Mode screensaver",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "photo/news screensaver (~70 MB)",
+      "breaks": "Ambient Mode: set our screensaver first",
+      "requires": "screensaver-replaced",
+      "evidence": {
+        "cytActiveLists": 9,
+        "cytCommentedLists": 2,
+        "uad": "Recommended: Needed for screensaver. https://play.google.com/store/apps/details?id=com.google.android.backdrop&hl=en&gl=US"
+      },
+      "sources": [
+        "cyt",
+        "uad",
+        "r-1ik0r3x"
+      ]
+    },
+    {
+      "pkg": "com.google.android.apps.tv.dreamx",
+      "name": "Google TV ambient screensaver",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "Google TV screensaver (~70 MB)",
+      "breaks": "Ambient Mode: set our screensaver first",
+      "requires": "screensaver-replaced",
+      "evidence": {
+        "cytActiveLists": 1,
+        "cytCommentedLists": 4,
+        "uad": "Recommended: Ambient Mode Running wallpapers from this app like a slideshow. https://play.google.com/store/apps/details?id=com.google.android.apps.tv.dre"
+      },
+      "sources": [
+        "cyt",
+        "uad",
+        "r-1xgbhem"
+      ]
+    },
+    {
+      "pkg": "com.mitv.dream",
+      "name": "Mi screensaver",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "Xiaomi screensaver",
+      "breaks": "set screensaver_components to another dream first, or the screen stays on",
+      "requires": "screensaver-replaced",
+      "evidence": {
+        "cytActiveLists": 9,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.mitv.screensaver",
+      "name": "Xiaomi screensaver",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "Xiaomi screensaver",
+      "breaks": "set ours first",
+      "requires": "screensaver-replaced",
+      "evidence": {
+        "cytActiveLists": 4,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.android.dreams.basic",
+      "name": "Basic colour screensaver",
+      "tier": "probably safe",
+      "action": "disable",
+      "reason": "AOSP colour dream",
+      "breaks": "nothing once ours is set",
+      "requires": "screensaver-replaced",
+      "evidence": {
+        "cytActiveLists": 3,
+        "cytCommentedLists": 1,
+        "uad": "Advanced: Daydream (not Google Daydream VR) is an interactive screensaver mode built into Android. With it turned on, it activates and shows the scree"
+      },
+      "sources": [
+        "cyt",
+        "uad"
+      ]
+    },
+    {
+      "pkg": "com.mitv.tvhome.atv",
+      "name": "PatchWall",
+      "tier": "risky",
+      "action": "disable",
+      "reason": "Xiaomi's home screen",
+      "breaks": "black screen if it is Home with no replacement; the PatchWall remote button; one report of a stuck boot after UNINSTALLING it (never uninstall)",
+      "requires": "home-replaced",
+      "disableOnly": true,
+      "evidence": {
+        "cytActiveLists": 30,
+        "cytCommentedLists": 1,
+        "uad": "Recommended: PatchWall Is it a spyware app? People recommend removing it."
+      },
+      "sources": [
+        "cyt",
+        "uad",
+        "r-185xsd5",
+        "r-1w47d49",
+        "r-1nu69a1",
+        "r-1ryw9bs"
+      ]
+    },
+    {
+      "pkg": "com.mitv.tvhome",
+      "name": "PatchWall (older package name)",
+      "tier": "risky",
+      "action": "disable",
+      "reason": "home screen on some firmware",
+      "breaks": "same as PatchWall; CYT keeps it on one set where it stayed Home after a reboot",
+      "requires": "home-replaced",
+      "disableOnly": true,
+      "evidence": {
+        "cytActiveLists": 0,
+        "cytCommentedLists": 6
+      },
+      "sources": [
+        "cyt",
+        "web-tvfresh"
+      ]
+    },
+    {
+      "pkg": "com.google.android.apps.tv.launcherx",
+      "name": "Google TV home",
+      "tier": "risky",
+      "action": "disable",
+      "reason": "Google TV home screen",
+      "breaks": "Google TV 14: Home falls to the setup wizard's RecoveryActivity and the TV soft-reboots every ~60 s unless setupwraith goes too; possibly casting; profile switching",
+      "requires": "home-replaced",
+      "disableOnly": true,
+      "evidence": {
+        "cytActiveLists": 3,
+        "cytCommentedLists": 2,
+        "uad": "Expert: Google TV Launcher to TV, there's no replace probably. https://play.google.com/store/apps/details?id=com.google.android.apps.tv.launcherx&hl"
+      },
+      "sources": [
+        "cyt",
+        "uad",
+        "cyt-a-pro-2026",
+        "r-1k9gfpx",
+        "r-1w47d49"
+      ]
+    },
+    {
+      "pkg": "com.google.android.apps.tv.launcherx.overlay",
+      "name": "Google TV home overlay",
+      "tier": "risky",
+      "action": "disable",
+      "reason": "goes with launcherx",
+      "breaks": "as launcherx",
+      "requires": "home-replaced",
+      "disableOnly": true,
+      "evidence": {
+        "cytActiveLists": 1,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.google.android.tvlauncher",
+      "name": "Android TV home",
+      "tier": "risky",
+      "action": "disable",
+      "reason": "stock Android TV home",
+      "breaks": "black screen with no replacement; UAD: on some devices removing it restores default settings at next power-on",
+      "requires": "home-replaced",
+      "disableOnly": true,
+      "evidence": {
+        "cytActiveLists": 6,
+        "cytCommentedLists": 1,
+        "uad": "Expert: Android TV Home, on some devices, removing this causes the device to restore default settings on the next power on. https://play.google.com/"
+      },
+      "sources": [
+        "cyt",
+        "uad",
+        "r-1nu69a1"
+      ]
+    },
+    {
+      "pkg": "com.google.android.leanbacklauncher",
+      "name": "Old Android TV home",
+      "tier": "risky",
+      "action": "disable",
+      "reason": "old stock home",
+      "breaks": "as above",
+      "requires": "home-replaced",
+      "disableOnly": true,
+      "evidence": {
+        "cytActiveLists": 3,
+        "cytCommentedLists": 0
+      },
+      "sources": [
+        "cyt"
+      ]
+    },
+    {
+      "pkg": "com.google.android.tungsten.setupwraith",
+      "name": "Google TV setup wizard",
+      "tier": "risky",
+      "action": "disable",
+      "reason": "first-run wizard; must go with launcherx on Google TV 14",
+      "breaks": "CYT: phone casting stopped after a reboot on the A43 2025; UAD: on Sony it broke volume; it can own the saved Wi-Fi network (the TV drops off Wi-Fi). The tool refuses it unless the Wi-Fi owner check passes",
+      "requires": "wifi-not-owned",
+      "disableOnly": true,
+      "evidence": {
+        "cytActiveLists": 12,
+        "cytCommentedLists": 4,
+        "uad": "Expert: First boot setup TV. Removing it crashes sound related system settings and breaks volume control on Sony Bravia TV. https://play.google.com/"
+      },
+      "sources": [
+        "cyt",
+        "uad",
+        "cyt-a-pro-2026",
+        "cyt-guard"
+      ],
+      "ask": "Google TV full home screen versus a casting risk (open decision 1)"
+    },
+    {
+      "pkg": "com.google.android.katniss",
+      "name": "Google Assistant (voice)",
+      "tier": "risky",
+      "action": "disable",
+      "reason": "frees a lot of RAM",
+      "breaks": "the remote's mic and voice search",
+      "disableOnly": true,
+      "evidence": {
+        "cytActiveLists": 7,
+        "cytCommentedLists": 9,
+        "uad": "Advanced: Google app, no replacement? https://play.google.com/store/apps/details?id=com.google.android.katniss&hl=en&gl=US"
+      },
+      "sources": [
+        "cyt",
+        "uad",
+        "r-1xgbhem",
+        "r-1ik0r3x"
+      ],
+      "ask": "Assistant: keep the remote's mic, or free the RAM?"
+    },
+    {
+      "pkg": "com.google.android.speech.pumpkin",
+      "name": "Assistant speech models",
+      "tier": "risky",
+      "action": "disable",
+      "reason": "goes with katniss",
+      "breaks": "voice",
+      "disableOnly": true,
+      "evidence": {
+        "cytActiveLists": 4,
+        "cytCommentedLists": 2,
+        "uad": "Advanced: PumpkinService Has something to speech."
+      },
+      "sources": [
+        "cyt",
+        "uad"
+      ],
+      "ask": "Assistant: keep the remote's mic, or free the RAM?"
+    }
+  ],
+  "dropped": [
+    {
+      "pkg": "com.xiaomi.tvqs.overseas",
+      "name": "Xiaomi quality service (overseas)",
+      "was": "risky",
+      "why": "hosts quick settings on some builds (CYT comments it out on 4 of 9 lists)",
+      "at": "2026-11-03 audit"
+    },
+    {
+      "pkg": "com.android.adservices.api",
+      "name": "Ad services (Privacy Sandbox)",
+      "was": "probably safe",
+      "why": "a mainline (APEX) module updated by Google Play system updates; Android may refuse it and it is not resident, so there is nothing to gain",
+      "at": "2026-11-03 audit"
+    },
+    {
+      "pkg": "com.android.federatedcompute.services",
+      "name": "Federated compute",
+      "was": "probably safe",
+      "why": "mainline module, as adservices",
+      "at": "2026-11-03 audit"
+    },
+    {
+      "pkg": "com.android.ondevicepersonalization.services",
+      "name": "On-device personalisation",
+      "was": "probably safe",
+      "why": "mainline module, as adservices",
+      "at": "2026-11-03 audit"
+    },
+    {
+      "pkg": "com.mitv.download.service",
+      "name": "Xiaomi download service",
+      "was": "risky",
+      "why": "may carry firmware (OTA) downloads; security updates are kept",
+      "at": "2026-11-03 audit"
+    },
+    {
+      "pkg": "com.google.android.tv",
+      "name": "Live Channels",
+      "was": "risky",
+      "why": "Live Channels: live TV is on the never-touch list (the owner's ask: inputs and live TV keep working); now hard-protected in tv-apply.mjs",
+      "at": "2026-11-03 audit"
+    },
+    {
+      "pkg": "com.mediatek.wwtv.webview",
+      "name": "MediaTek web view shell",
+      "was": "risky",
+      "why": "unknown role (a MediaTek web view shell something may render through); no benefit is measurable without the TV, so not worth the risk",
+      "at": "2026-11-03 audit"
+    }
+  ],
+  "audited": "2026-11-03: every package has a reason and a known source and is disabled with `pm disable-user --user 0` (undo `pm enable --user 0`); 7 dropped (see dropped[]); USB and Assistant packages wait on the owner's answer (ask); tvrecommendations moved to risky. tv-apply.mjs validates this file before every run."
+}

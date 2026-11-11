@@ -1,0 +1,4 @@
+[
+  { "id": "poco", "name": "POCO X6", "label": "POCO", "connect": "192.168.1.78:5555", "model": "2311DRK48G", "device": "duchamp", "reminder": true },
+  { "id": "s24", "name": "S24 Ultra", "serial": "R5TEST00000", "model": "SM_S928B", "device": "e3q", "wearables": true, "readOnly": true }
+]

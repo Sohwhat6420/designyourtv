@@ -1,0 +1,3 @@
+#!/bin/sh
+# Git Bash wrapper so the runbook's raw "$ADB" lines can run against the fake TV: ADB=tools/test/fake-adb
+exec node "$(dirname "$0")/fake-adb.mjs" "$@"

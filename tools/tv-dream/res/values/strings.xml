@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">designyourtv</string>
+    <string name="dream_name">designyourtv wallpaper</string>
+    <string name="tile_name">Claude</string>
+    <string name="wall_name">Wallpaper</string>
+    <string name="np_name">designyourtv now playing</string>
+    <string name="a11y_name">designyourtv Home button</string>
+    <string name="a11y_desc">Opens the wallpaper when you press Home or when Google TV\'s home screen comes up. Press Home again on the wallpaper for Google TV. It reads no screen content.</string>
+</resources>

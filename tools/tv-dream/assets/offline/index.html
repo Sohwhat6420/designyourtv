@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>designyourtv</title>
+<!-- The screensaver's built-in copy, shown when the desk laptop's hub doesn't answer. Self-contained: the offline plate
+     (build-tv-apk.mjs --offline-plate) with the clock set behind its foreground (the same depth layering as tv-setup.html), a 12-hour clock and
+     the date. The app switches back to the hub's page within a minute of it answering again. -->
+<style>
+  :root { --ink: #eef3fb; --ink-soft: rgba(238, 243, 251, .78); --shade: rgba(8, 18, 38, .42); }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #000; cursor: none; }
+  body { font-family: "Roboto", "Google Sans", system-ui, sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
+  .stage { position: fixed; inset: 0; transition: opacity 1.6s ease, filter 1.6s ease; }
+  .layer { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .plate { animation: drift 90s ease-in-out infinite alternate; transform-origin: 50% 70%; }
+  .fg { animation: drift 90s ease-in-out infinite alternate; transform-origin: 50% 70%; }
+  @keyframes drift { from { transform: scale(1); } to { transform: scale(1.035); } }
+  .clock { position: absolute; left: 0; right: 0; top: 7vh; text-align: center; line-height: 1; }
+  .date { font-weight: 500; font-size: 2.7vh; letter-spacing: .04em; color: var(--ink-soft); margin-bottom: 1.2vh;
+          text-shadow: 0 .2vh 1.2vh var(--shade); font-variant-numeric: tabular-nums; }
+  .time { font-weight: 300; font-size: 34vh; letter-spacing: -.02em; font-variant-numeric: tabular-nums;
+          text-shadow: 0 .6vh 4vh var(--shade); }
+  .time .ampm { font-size: .13em; font-weight: 400; letter-spacing: .06em; margin-left: .3em; vertical-align: .9em; color: var(--ink-soft); }
+  .note { position: absolute; right: 2.4vw; bottom: 2.4vh; font-size: 1.5vh; letter-spacing: .05em; color: rgba(255,255,255,.34); }
+  .night .stage { opacity: .55; filter: saturate(.7); }
+  @media (prefers-reduced-motion: reduce) { .plate, .fg { animation: none; } }
+</style>
+</head>
+<body>
+<div class="stage">
+  <img class="layer plate" src="offline.plate.webp" alt="">
+  <div class="clock" aria-live="off">
+    <div class="date" id="date"></div>
+    <div class="time" id="time"></div>
+  </div>
+  <img class="layer fg" src="offline.fg.webp" alt="">
+  <div class="note">Offline copy · the hub will take over when it answers</div>
+</div>
+<script>
+  const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const $time = document.getElementById("time"), $date = document.getElementById("date");
+  function tick() {
+    const d = new Date();
+    const h = d.getHours() % 12 || 12, m = String(d.getMinutes()).padStart(2, "0");
+    $time.innerHTML = `${h}:${m}<span class="ampm">${d.getHours() < 12 ? "AM" : "PM"}</span>`;
+    $date.textContent = `${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]}`;
+    const mins = d.getHours() * 60 + d.getMinutes();
+    document.body.classList.toggle("night", mins >= 23 * 60 + 30 || mins < 7 * 60);
+    setTimeout(tick, 1000 - d.getMilliseconds() + 5);
+  }
+  tick();
+  if (window.DesignYourTV && typeof DesignYourTV.ready === "function") {
+    try { DesignYourTV.ready(); } catch (e) {}
+  }
+</script>
+</body>
+</html>

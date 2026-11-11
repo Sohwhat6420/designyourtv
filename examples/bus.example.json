@@ -1,0 +1,7 @@
+{
+  "stops": [
+    { "code": "10001", "name": "Riverside Stop" },
+    { "code": "10002", "name": "Market Street" }
+  ],
+  "exclude": ["999"]
+}

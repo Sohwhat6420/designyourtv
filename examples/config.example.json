@@ -1,0 +1,152 @@
+{
+  "choices": {
+    "placeholder": {
+      "schema": 1,
+      "plateId": "placeholder",
+      "name": "Valley at dusk",
+      "status": "keep",
+      "inRotation": true,
+      "feedback": "",
+      "settings": {
+        "face": "tall",
+        "mat": "ghost",
+        "tone": "dark",
+        "size": 27,
+        "stretch": 130,
+        "width": 100,
+        "pos": "high",
+        "place": "center",
+        "orient": "row",
+        "flip": false,
+        "depth": "all",
+        "ink": "#f3e3c4",
+        "wl": "col",
+        "date": true
+      },
+      "suggested": {
+        "face": "fat",
+        "mat": "ghost",
+        "tone": "dark",
+        "size": 27,
+        "stretch": 130,
+        "width": 100,
+        "pos": "high",
+        "place": "center",
+        "orient": "row",
+        "flip": false,
+        "depth": "all",
+        "ink": "auto",
+        "wl": "col",
+        "date": true
+      },
+      "changed": [
+        "face"
+      ],
+      "updatedAt": "2026-11-03T00:00:00.000Z"
+    },
+    "placeholder-dawn": {
+      "schema": 1,
+      "plateId": "placeholder-dawn",
+      "name": "Valley at dawn",
+      "status": "keep",
+      "inRotation": true,
+      "feedback": "",
+      "settings": {
+        "face": "serif",
+        "mat": "ghost",
+        "tone": "dark",
+        "size": 27,
+        "stretch": 130,
+        "width": 100,
+        "pos": "high",
+        "place": "center",
+        "orient": "row",
+        "flip": false,
+        "depth": "all",
+        "ink": "#2b2f33",
+        "wl": "col",
+        "date": true
+      },
+      "suggested": {
+        "face": "fat",
+        "mat": "ghost",
+        "tone": "dark",
+        "size": 27,
+        "stretch": 130,
+        "width": 100,
+        "pos": "high",
+        "place": "center",
+        "orient": "row",
+        "flip": false,
+        "depth": "all",
+        "ink": "auto",
+        "wl": "col",
+        "date": true
+      },
+      "changed": [
+        "face",
+        "ink"
+      ],
+      "updatedAt": "2026-11-03T00:00:00.000Z"
+    }
+  },
+  "globals": {
+    "tv": {
+      "schema": 1,
+      "fmt": "12",
+      "interval": 600,
+      "rotation": "approved",
+      "dockShow": "remote",
+      "dockApps": [
+        "netflix",
+        "youtube",
+        "ytmusic",
+        "iqiyi",
+        "mewatch",
+        "allapps",
+        "inputs",
+        "settings"
+      ],
+      "corner": "claude",
+      "musicMode": "card",
+      "updatedAt": "2026-11-03T00:00:00.000Z"
+    },
+    "travel": {
+      "schema": 1,
+      "show": {
+        "wait": true,
+        "wx": true,
+        "cal": true,
+        "next": true,
+        "batt": true
+      },
+      "dock": {
+        "batt": true,
+        "wait": true,
+        "next": true,
+        "np": true,
+        "home": true,
+        "wx": true
+      },
+      "area": "City",
+      "order": "slot",
+      "updatedAt": "2026-11-03T00:00:00.000Z"
+    },
+    "desk": {
+      "schema": 1,
+      "dock": {
+        "batt": true,
+        "wait": true,
+        "next": true,
+        "np": true,
+        "home": true,
+        "disk": true,
+        "gpu": true,
+        "bus": true,
+        "commit": true
+      },
+      "updatedAt": "2026-11-03T00:00:00.000Z"
+    }
+  },
+  "updatedAt": "2026-11-03T00:00:00.000Z"
+}

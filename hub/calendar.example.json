@@ -1,0 +1,5 @@
+{
+  "ics_url": "REPLACE-WITH-THE-SECRET-ICAL-ADDRESS-FROM-GOOGLE-CALENDAR",
+  "horizon_days": 60,
+  "tz": "Asia/Singapore"
+}

@@ -1,0 +1,38 @@
+{
+  "$comment": "What tv-apply.mjs checks before it installs anything on the TV. The Claude files are git-ignored (apk/); their hashes and signer are recorded here. Provenance, proven 3 Nov 2026: the three files are byte-identical (SHA-256) to the copy the Play Store installed on the POCO X6 (pm path com.anthropic.claude; installerPackageName=com.android.vending, initiatingPackageName=com.android.vending), pulled read-only over adb and compared, and apksigner verify --print-certs (build-tools 36.0.0) gives the same signer and source-stamp certificates for both sets. Any other Claude build (an older one for an SDK < 32 TV) must carry the same signer SHA-256: tv-apply.mjs --install-claude --apk-dir <dir> refuses it otherwise.",
+  "claude": {
+    "pkg": "com.anthropic.claude",
+    "dir": "apk/claude",
+    "versionName": "1.261030.19",
+    "versionCode": 26103019,
+    "minSdk": 32,
+    "targetSdk": 37,
+    "nativeCode": ["arm64-v8a"],
+    "launch": "com.anthropic.claude/com.anthropic.claude.mainactivity.MainActivity",
+    "signerSha256": "305a1e8a432e5ec0c612b2465359c3b88e3c95d6253599ac6088562b818b64a0",
+    "signerDN": "CN=Android, OU=Android, O=Google Inc., L=Mountain View, ST=California, C=US (Play App Signing key held by Google for Anthropic)",
+    "sourceStampSha256": "3257d599a49d2c961a471ca9843f59d341a405884583fc087df4237b733bbd6d",
+    "schemes": "v3 only (no v1/v2); Verified for SourceStamp: true",
+    "files": {
+      "base.apk": "e92e117a64eaa75075885ddd03cf345ba11b9a209399c093a4a56a4dd1071fb8",
+      "split_config.arm64_v8a.apk": "c29ab5edc1d47622627e86079fef7a8e4b9ce4cab093294edf72d4df5d9f7617",
+      "split_config.xxhdpi.apk": "34760040ce6d360ea0a53d504fcc3107e05c221d60559fb163644ddb9b9cfa6d"
+    },
+    "provenance": {
+      "checked": "2026-11-03",
+      "poco": "192.168.1.78:5555 (ro.serialno ZTTEST0000000000, model 2311DRK48G), read-only: pm path, dumpsys package, adb pull",
+      "pocoInstaller": "com.android.vending",
+      "sha256Match": true,
+      "signerMatch": true,
+      "stampMatch": true
+    }
+  },
+  "dream": {
+    "pkg": "dev.designyourtv",
+    "file": "apk/tv-dream/designyourtv.apk",
+    "minSdk": 23,
+    "dream": "dev.designyourtv/.WallDream",
+    "tile": "dev.designyourtv/.ClaudeTile",
+    "home": "dev.designyourtv/.HomeAlias"
+  }
+}

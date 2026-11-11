@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Plain HTTP only to the hub (it has no TLS); everything else must be HTTPS. tools/build-tv-apk.mjs puts the
+     hub's host here at build time; 192.168.1.10 is only the example. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">192.168.1.10</domain>
+    </domain-config>
+</network-security-config>

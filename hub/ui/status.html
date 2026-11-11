@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home hub</title>
+<meta name="description" content="The desk laptop's home hub: phones, Claude limits, buses, system and every screen it serves.">
+<style>
+:root {
+  --bg: #0d0f12; --panel: #14171c; --line: #23272f; --ink: #e8eaee; --ink-2: #a3a9b4; --ink-3: #6f7682;
+  --ok: #5cc28f; --warn: #e3a942; --bad: #ef6a5b; --accent: #8fb7ff; --track: #262b34;
+  --alert-bg: #3a1714; --alert-ink: #ffd9d3; --alert-line: #7a2c24;
+  --mono: ui-monospace, "Cascadia Mono", "SF Mono", Consolas, monospace;
+  --sans: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f4f5f7; --panel: #ffffff; --line: #dfe2e7; --ink: #15181d; --ink-2: #4b525d; --ink-3: #6b727d;
+    --ok: #1d7d4f; --warn: #9a6400; --bad: #b8322a; --accent: #2b5fc7; --track: #e7e9ed;
+    --alert-bg: #fdecea; --alert-ink: #6b1610; --alert-line: #f1b6ae; color-scheme: light;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 var(--sans); }
+body { padding: 20px 24px 40px; max-width: 1440px; margin: 0 auto; }
+.num, td.n, .big { font-variant-numeric: tabular-nums; }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+
+header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; padding-bottom: 14px; border-bottom: 1px solid var(--line); margin-bottom: 16px; }
+h1 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: .01em; }
+.meta { color: var(--ink-2); font-size: 13px; }
+.meta b { color: var(--ink); font-weight: 500; }
+.live { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-2); }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-3); flex: none; }
+.dot.ok { background: var(--ok); } .dot.warn { background: var(--warn); } .dot.bad { background: var(--bad); }
+
+#alerts:empty { display: none; }
+#alerts { display: grid; gap: 8px; margin-bottom: 16px; }
+.alert { display: flex; align-items: center; gap: 16px; padding: 14px 18px; border: 1px solid var(--alert-line); background: var(--alert-bg); color: var(--alert-ink); border-radius: 8px; }
+.alert .big { font-size: 30px; font-weight: 650; line-height: 1; min-width: 3.2ch; }
+.alert strong { display: block; font-size: 16px; }
+.alert span { font-size: 13px; opacity: .85; }
+
+.grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; }
+section { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px 16px; min-width: 0; }
+.s4 { grid-column: span 4; } .s5 { grid-column: span 5; } .s7 { grid-column: span 7; } .s8 { grid-column: span 8; } .s12 { grid-column: span 12; }
+.col { display: grid; gap: 14px; align-content: start; min-width: 0; }
+@media (max-width: 1100px) { .s4, .s5, .s7, .s8 { grid-column: span 6; } }
+@media (max-width: 720px) { body { padding: 16px; } .s4, .s5, .s7, .s8, .s12 { grid-column: span 12; } .live { margin-left: 0; } }
+.grid { align-items: start; }
+ul.links.row { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px 24px; }
+h2 { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-2); margin: 0 0 12px; display: flex; justify-content: space-between; gap: 8px; }
+h2 small { text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--ink-3); font-size: 12px; }
+.stale { opacity: .55; }
+.stale-tag { color: var(--warn); font-size: 12px; margin-left: 6px; }
+.empty { color: var(--ink-3); font-size: 13px; }
+
+/* meters */
+.meter { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; margin-bottom: 14px; }
+.meter:last-child { margin-bottom: 0; }
+.meter .lbl { color: var(--ink-2); font-size: 13px; }
+.meter .val { font-size: 20px; font-weight: 600; text-align: right; line-height: 1.1; }
+.bar { grid-column: 1 / -1; height: 6px; background: var(--track); border-radius: 3px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--accent); border-radius: 3px; transition: width .25s ease-out; }
+.bar i.warn { background: var(--warn); } .bar i.bad { background: var(--bad); } .bar i.ok { background: var(--ok); }
+.meter .sub { grid-column: 1 / -1; color: var(--ink-3); font-size: 12px; }
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+
+/* phones */
+.phone { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+.phone:first-of-type { border-top: 0; padding-top: 0; }
+.phone .name { font-weight: 600; }
+.phone .val { font-size: 22px; font-weight: 650; text-align: right; line-height: 1; }
+.phone .sub { grid-column: 1 / -1; color: var(--ink-3); font-size: 12px; }
+.phone.low .val { color: var(--bad); }
+
+/* system */
+.sys { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+@media (max-width: 720px) { .sys { grid-template-columns: 1fr; } }
+.tile { border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; }
+.tile .k { color: var(--ink-2); font-size: 12px; display: flex; justify-content: space-between; }
+.tile .v { font-size: 22px; font-weight: 600; margin: 2px 0 6px; }
+.tile .v small { font-size: 13px; color: var(--ink-3); font-weight: 400; }
+svg.spark { width: 100%; height: 34px; display: block; }
+svg.spark polyline { fill: none; stroke: var(--accent); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+svg.spark line { stroke: var(--line); stroke-width: 1; vector-effect: non-scaling-stroke; }
+dl.facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px 16px; margin: 14px 0 0; }
+dl.facts div { min-width: 0; }
+dt { color: var(--ink-3); font-size: 12px; }
+dd { margin: 0; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* tables */
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; font-weight: 500; color: var(--ink-3); font-size: 12px; padding: 0 8px 6px 0; }
+td { padding: 6px 8px 6px 0; border-top: 1px solid var(--line); vertical-align: top; }
+td.n { text-align: right; white-space: nowrap; }
+th.n { text-align: right; }
+.stop + .stop { margin-top: 14px; }
+.stop h3 { font-size: 13px; font-weight: 600; margin: 0 0 4px; display: flex; justify-content: space-between; }
+.stop h3 span { color: var(--ink-3); font-weight: 400; font-family: var(--mono); font-size: 12px; }
+.svc { font-family: var(--mono); font-weight: 600; }
+.load { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-left: 5px; vertical-align: 1px; }
+.load.SEA { background: var(--ok); } .load.SDA { background: var(--warn); } .load.LSD { background: var(--bad); }
+.legend { color: var(--ink-3); font-size: 12px; margin-top: 10px; }
+.legend .load { margin: 0 4px 0 10px; } .legend .load:first-child { margin-left: 0; }
+
+.np .t { font-size: 16px; font-weight: 600; }
+.np .a { color: var(--ink-2); }
+ul.links { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+ul.links li { display: flex; justify-content: space-between; gap: 12px; }
+ul.links code { font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
+.err { color: var(--warn); font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Home hub</h1>
+  <span class="meta" id="hubmeta">connecting…</span>
+  <span class="live" role="status" aria-live="polite"><span class="dot" id="livedot"></span><span id="livetxt">connecting</span></span>
+</header>
+
+<div id="alerts" role="alert" aria-live="assertive"></div>
+
+<main class="grid">
+  <section class="s4" aria-labelledby="h-phones"><h2 id="h-phones">Phone batteries <small id="phones-at"></small></h2><div id="phones"><p class="empty">No reading yet.</p></div></section>
+  <section class="s4" aria-labelledby="h-claude"><h2 id="h-claude">Claude limits <small id="claude-at"></small></h2><div id="claude"><p class="empty">No reading yet.</p></div></section>
+  <section class="s4 np" aria-labelledby="h-np"><h2 id="h-np">Playing on the desk laptop</h2><div id="np"><p class="empty">Nothing yet.</p></div></section>
+
+  <div class="s7 col">
+    <section aria-labelledby="h-sys"><h2 id="h-sys">This Desk <small id="sys-at"></small></h2><div id="sys"><p class="empty">No reading yet.</p></div></section>
+    <section aria-labelledby="h-dev"><h2 id="h-dev">Screens and devices <small>last seen</small></h2><div id="devices"><p class="empty">No reading yet.</p></div></section>
+  </div>
+  <section class="s5" aria-labelledby="h-bus"><h2 id="h-bus">Buses <small id="bus-at"></small></h2><div id="bus"><p class="empty">No reading yet.</p></div></section>
+
+  <section class="s12" aria-labelledby="h-pages"><h2 id="h-pages">Pages</h2>
+    <ul class="links row">
+      <li><a href="/tv-setup.html">Configurator</a><code>tv-setup.html</code></li>
+      <li><a href="/tv-setup.html?kiosk=tv">TV wallpaper</a><code>?kiosk=tv</code></li>
+      <li><a href="/tv-setup.html?kiosk=desk">Desk wallpaper</a><code>?kiosk=desk</code></li>
+      <li><a href="/tv-setup.html?kiosk=travel">Travel wallpaper</a><code>?kiosk=travel</code></li>
+      <li><a href="/api/health">API health</a><code>/api/health</code></li>
+    </ul>
+  </section>
+</main>
+
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const S = { claude: null, sys: null, bus: null, phones: null, np: null, devices: null, health: null, stamps: {} };
+
+function ago(iso) {
+  if (!iso) return "never";
+  const s = Math.max(0, Math.round((Date.now() - Date.parse(iso)) / 1000));
+  if (s < 5) return "just now";
+  if (s < 90) return `${s} s ago`;
+  if (s < 5400) return `${Math.round(s / 60)} min ago`;
+  if (s < 172800) return `${Math.round(s / 3600)} h ago`;
+  return `${Math.round(s / 86400)} days ago`;
+}
+const clock = iso => iso ? new Date(iso).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Singapore" }) : "";
+const n = (v, d = 0) => (v === null || v === undefined || !Number.isFinite(+v) ? "–" : (+v).toFixed(d));
+const sev = (p, warn = 70, bad = 90) => (p >= bad ? "bad" : p >= warn ? "warn" : "");
+
+function spark(arr) {
+  const v = (arr || []).map(x => (x === null ? null : +x));
+  if (v.filter(x => x !== null).length < 2) return `<svg class="spark" viewBox="0 0 60 34" preserveAspectRatio="none" aria-hidden="true"><line x1="0" y1="33" x2="60" y2="33"/></svg>`;
+  const step = 60 / Math.max(1, v.length - 1);
+  const pts = v.map((x, i) => x === null ? null : `${(i * step).toFixed(1)},${(33 - (Math.min(100, Math.max(0, x)) / 100) * 31).toFixed(1)}`).filter(Boolean).join(" ");
+  return `<svg class="spark" viewBox="0 0 60 34" preserveAspectRatio="none" aria-hidden="true"><line x1="0" y1="33" x2="60" y2="33"/><polyline points="${pts}"/></svg>`;
+}
+
+function paintAlerts() {
+  const low = (S.phones || []).filter(p => p.low);
+  $("#alerts").innerHTML = low.map(p => `<div class="alert"><span class="big num">${n(p.pct)}%</span>
+    <div><strong>${esc(p.name)} needs charging</strong><span>${p.online ? "Read" : "Last read"} ${ago(p.read_at)}${p.online ? "" : ", phone not reachable since"}. Plug it in before it goes flat.</span></div></div>`).join("");
+  document.title = low.length ? `${low.map(p => `${p.name} ${p.pct}%`).join(", ")} · Home hub` : "Home hub";
+}
+
+function paintPhones() {
+  const list = S.phones;
+  if (!list || !list.length) return;
+  $("#phones").innerHTML = list.map(p => {
+    const known = p.pct !== null && p.pct !== undefined;
+    const state = !known ? "No reading yet" : p.charging ? "Charging" : p.plugged ? "On power" : "On battery";
+    const cls = !known ? "" : p.low ? "bad" : p.pct <= 40 ? "warn" : "ok";
+    return `<div class="phone${p.low ? " low" : ""}${p.online ? "" : " stale"}"><span class="name">${esc(p.name)}</span>
+      <span class="val num">${known ? n(p.pct) + "%" : "–"}</span>
+      <div class="bar" role="meter" aria-label="${esc(p.name)} battery" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${known ? p.pct : 0}"><i class="${cls}" style="width:${known ? p.pct : 0}%"></i></div>
+      <span class="sub">${state}${p.temp_c != null ? ` · ${n(p.temp_c, 1)} °C` : ""} · ${p.online ? "read " + ago(p.read_at) : p.read_at ? "offline, last read " + ago(p.read_at) : "not connected"}</span></div>`;
+  }).join("");
+  const at = list.map(p => p.read_at).filter(Boolean).sort().pop();
+  $("#phones-at").textContent = at ? "every 5 min" : "";
+  paintAlerts();
+}
+
+function paintClaude() {
+  const u = S.claude;
+  if (!u) return;
+  if (!u.session && !u.weekly) { $("#claude").innerHTML = `<p class="empty">${esc(u.why || "No reading yet.")}</p>`; return; }
+  const m = (label, w) => !w ? "" : `<div class="meter"><span class="lbl">${label}</span><span class="val num">${n(w.pct)}%</span>
+    <div class="bar" role="meter" aria-label="${label}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${w.pct ?? 0}"><i class="${sev(w.pct)}" style="width:${Math.min(100, w.pct || 0)}%"></i></div>
+    <span class="sub">${w.expired ? "Reset since the reading" : "Resets " + (/^\d/.test(w.reset) ? "in " : "") + esc(w.reset)}</span></div>`;
+  $("#claude").innerHTML = `<div class="${u.stale ? "stale" : ""}">${m("5-hour session", u.session)}${m("Weekly", u.weekly)}</div>
+    ${u.walled ? `<p class="err">At the limit now.</p>` : ""}
+    ${u.probe_error ? `<p class="err">Live check failing: ${esc(u.probe_error)}</p>` : ""}`;
+  $("#claude-at").innerHTML = `read ${ago(u.read_at)}${u.stale ? '<span class="stale-tag">stale</span>' : ""}`;
+}
+
+function paintNp() {
+  const p = S.np;
+  if (!p) return;
+  if (p.status === "unavailable") { $("#np").innerHTML = `<p class="empty">Not available: ${esc(p.why || "")}</p>`; return; }
+  if (!p.title) { $("#np").innerHTML = `<p class="empty">Nothing playing.</p>`; return; }
+  const app = String(p.app || "").replace(/^.*!/, "").replace(/\.exe$/i, "");
+  $("#np").innerHTML = `<div class="t">${esc(p.title)}</div><div class="a">${esc([p.artist, p.album].filter(Boolean).join(" · "))}</div>
+    <dl class="facts"><div><dt>State</dt><dd>${esc(p.status)}</dd></div><div><dt>Position</dt><dd class="num">${mmss(p.position_s)} / ${mmss(p.duration_s)}</dd></div><div><dt>App</dt><dd>${esc(app || "–")}</dd></div></dl>`;
+}
+const mmss = s => (Number.isFinite(+s) && +s > 0 ? `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}` : "–");
+
+function paintSys() {
+  const s = S.sys;
+  if (!s) return;
+  const g = s.gpu;
+  const tile = (k, v, unit, hist, right = "") => `<div class="tile"><div class="k"><span>${k}</span><span class="num">${right}</span></div>
+    <div class="v num">${v}<small> ${unit}</small></div>${spark(hist)}</div>`;
+  $("#sys").innerHTML = `<div class="sys">
+      ${tile("CPU", n(s.cpu_pct), "%", s.history?.cpu, s.cpu_temp_c != null ? n(s.cpu_temp_c) + " °C" : "")}
+      ${tile("GPU", g ? n(g.util_pct) : "–", "%", s.history?.gpu, g && g.temp_c != null ? n(g.temp_c) + " °C" : "")}
+      ${tile("Memory", n(s.ram?.used_gb, 1), `of ${n(s.ram?.total_gb, 0)} GB`, s.history?.ram, n(s.ram?.pct) + "%")}
+    </div>
+    <dl class="facts">
+      <div><dt>CPU temperature</dt><dd>${s.cpu_temp_c != null ? n(s.cpu_temp_c) + " °C" : "needs LibreHardwareMonitor"}</dd></div>
+      <div><dt>GPU memory</dt><dd class="num">${g ? `${n(g.mem_used_mb / 1024, 1)} / ${n(g.mem_total_mb / 1024, 0)} GB` : "–"}</dd></div>
+      <div><dt>GPU power</dt><dd class="num">${g && g.power_w != null ? n(g.power_w, 0) + " W" : "–"}</dd></div>
+      <div><dt>Battery</dt><dd class="num">${s.battery ? `${n(s.battery.pct)}% ${s.battery.charging ? "charging" : s.battery.plugged ? "on power" : "on battery"}` : "–"}</dd></div>
+      <div><dt>Disk C: free</dt><dd class="num">${s.disk ? `${n(s.disk.free_gb, 0)} of ${n(s.disk.total_gb, 0)} GB` : "–"}</dd></div>
+      <div><dt>Network</dt><dd class="num">${s.net ? `↓ ${n(s.net.down_kbps)} · ↑ ${n(s.net.up_kbps)} KB/s` : "–"}</dd></div>
+    </dl>`;
+  $("#sys-at").textContent = `${s.cores} threads · read ${ago(s.read_at)}`;
+}
+
+function paintBus() {
+  const b = S.bus;
+  if (!b) return;
+  if (b.error && !(b.stops || []).length) { $("#bus").innerHTML = `<p class="err">${esc(b.error)}</p>`; return; }
+  const m = x => (x == null ? "" : x.min === 0 ? "Arr" : `${x.min}`);
+  $("#bus").innerHTML = (b.stops || []).map(st => `<div class="stop"><h3>${esc(st.name)}<span>${esc(st.code)}</span></h3>
+    ${st.error ? `<p class="err">${esc(st.error)}</p>` : !st.services.length ? `<p class="empty">No buses listed.</p>` :
+    `<table><thead><tr><th scope="col">Service</th><th scope="col" class="n">Next (min)</th><th scope="col" class="n">Then</th><th scope="col" class="n">After</th></tr></thead><tbody>
+    ${st.services.map(v => `<tr><td class="svc">${esc(v.no)}</td>${[0, 1, 2].map(i => `<td class="n">${m(v.next[i])}${v.next[i]?.load ? `<span class="load ${v.next[i].load}" title="${({ SEA: "Seats available", SDA: "Standing available", LSD: "Limited standing" })[v.next[i].load]}"></span>` : ""}</td>`).join("")}</tr>`).join("")}
+    </tbody></table>`}</div>`).join("") +
+    `<p class="legend"><span class="load SEA"></span>seats <span class="load SDA"></span>standing <span class="load LSD"></span>limited · 169 left out</p>`;
+  $("#bus-at").textContent = `read ${ago(b.read_at)}`;
+}
+
+function uaName(ua) {
+  ua = ua || "";
+  if (/node|undici/i.test(ua)) return "agent";
+  if (/Android/.test(ua) && /TV|AFT|BRAVIA|MiTV|Xiaomi/i.test(ua)) return "Android TV";
+  if (/Android/.test(ua)) return "Android";
+  if (/Edg\//.test(ua)) return "Edge"; if (/Chrome\//.test(ua)) return "Chrome"; if (/Firefox\//.test(ua)) return "Firefox";
+  if (/Safari\//.test(ua)) return "Safari"; if (/curl/i.test(ua)) return "curl";
+  return ua.slice(0, 24) || "unknown";
+}
+
+function paintDevices() {
+  const d = S.devices;
+  if (!d) return;
+  const rows = [];
+  rows.push(`<tr><td>${esc(d.hub.device)} <span class="empty">(this hub)</span></td><td>${esc(d.hub.hostname)}</td><td>serving</td><td class="n">now</td></tr>`);
+  for (const p of d.pushed) rows.push(`<tr class="${p.age_s > 30 ? "stale" : ""}"><td>${esc(p.device)}</td><td class="num">${esc(p.ip)}</td><td>agent, stats every 5 s${p.battery ? ` · ${n(p.battery.pct)}%` : ""}</td><td class="n">${ago(p.last_seen)}</td></tr>`);
+  const streamIps = new Set(d.streams.map(s => s.ip));
+  for (const c of d.clients) rows.push(`<tr class="${c.age_s > 600 ? "stale" : ""}"><td>${esc(c.device || uaName(c.ua))}</td><td class="num">${esc(String(c.ip).replace(/^::ffff:/, ""))}</td><td>${streamIps.has(c.ip) ? "live stream" : esc(c.last_path)}</td><td class="n">${ago(c.last_seen)}</td></tr>`);
+  $("#devices").innerHTML = `<table><thead><tr><th scope="col">Screen</th><th scope="col">Address</th><th scope="col">Doing</th><th scope="col" class="n">Last seen</th></tr></thead><tbody>${rows.join("")}</tbody></table>`;
+}
+
+function paintHealth() {
+  const h = S.health;
+  if (!h) return;
+  const up = h.uptime_s < 3600 ? `${Math.round(h.uptime_s / 60)} min` : `${(h.uptime_s / 3600).toFixed(1)} h`;
+  const ips = h.lan_ips || [];
+  const addr = ips.includes(location.hostname) ? location.hostname : ips.find(ip => ip.startsWith("192.168.1.")) || ips.find(ip => ip.startsWith("192.168.")) || location.hostname;
+  $("#hubmeta").innerHTML = `<b>${esc(h.hostname)}</b> · <span class="num">${esc(addr)}:${esc(location.port || "80")}</span> · up ${up} · v${esc(h.version)}${h.via === "agent" ? " · via this laptop's agent" : ""}`;
+}
+
+const paint = { claude: paintClaude, sys: paintSys, bus: paintBus, phones: paintPhones, np: paintNp, devices: paintDevices, health: paintHealth };
+const set = (k, v) => { if (v !== undefined && v !== null) { S[k] = v; paint[k](); } };
+const get = p => fetch(p, { cache: "no-store" }).then(r => (r.ok ? r.json() : null)).catch(() => null);
+async function refresh(all) {
+  const jobs = [get("/api/devices").then(v => set("devices", v)), get("/api/health").then(v => set("health", v))];
+  if (all) jobs.push(get("/api/claude").then(v => set("claude", v)), get("/api/system").then(v => set("sys", v)),
+    get("/api/bus").then(v => set("bus", v)), get("/api/batteries").then(v => set("phones", v)), get("/api/nowplaying").then(v => set("np", v)));
+  await Promise.all(jobs);
+}
+
+function live(state, text) { $("#livedot").className = "dot " + state; $("#livetxt").textContent = text; }
+let lastEvent = 0;
+function connect() {
+  if (!window.EventSource) { live("warn", "polling"); setInterval(() => refresh(true), 5000); return; }
+  const es = new EventSource("/api/events?device=status-page");
+  const on = (ev, k) => es.addEventListener(ev, e => { lastEvent = Date.now(); try { set(k, JSON.parse(e.data)); } catch {} });
+  on("claude", "claude"); on("system", "sys"); on("bus", "bus"); on("batteries", "phones"); on("nowplaying", "np");
+  es.addEventListener("open", () => { live("ok", "live"); refresh(true); });
+  es.addEventListener("error", () => live("bad", "reconnecting"));
+  es.addEventListener("device", () => refresh(false));
+}
+refresh(true); connect();
+setInterval(() => refresh(false), 10e3);
+// keep every "x ago" honest without waiting for new data
+setInterval(() => { paintClaude(); paintBus(); paintPhones(); paintSys(); paintDevices(); if (lastEvent && Date.now() - lastEvent > 20e3) live("warn", "quiet"); }, 5000);
+</script>
+</body>
+</html>

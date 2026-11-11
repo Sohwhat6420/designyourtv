@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- designyourtv: the wallpaper screensaver, a Wallpaper tile, and the Claude tile. Built by tools/build-tv-apk.mjs. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="dev.designyourtv">
+
+    <uses-feature android:name="android.software.leanback" android:required="false" />
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- Granted once over adb by tv-apply.mjs (undo: pm revoke); the Claude tile's density switch needs it. -->
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
+    <!-- Allowed once over adb (appops set ... GET_USAGE_STATS allow); the guard sees when Claude leaves the screen. -->
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />
+
+    <queries>
+        <intent><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent>
+        <intent><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LEANBACK_LAUNCHER" /></intent>
+    </queries>
+
+    <application
+        android:label="@string/app_name"
+        android:icon="@drawable/icon"
+        android:banner="@drawable/banner"
+        android:allowBackup="false"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:theme="@android:style/Theme.DeviceDefault.NoActionBar.Fullscreen">
+
+        <service
+            android:name=".WallDream"
+            android:exported="true"
+            android:label="@string/dream_name"
+            android:permission="android.permission.BIND_DREAM_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.dreams.DreamService" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <activity
+            android:name=".ClaudeTile"
+            android:exported="true"
+            android:label="@string/tile_name"
+            android:icon="@drawable/icon_claude"
+            android:banner="@drawable/banner_claude"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:launchMode="singleTask"
+            android:taskAffinity="dev.designyourtv.tile"
+            android:configChanges="density|screenSize|smallestScreenSize|screenLayout|orientation|keyboard|keyboardHidden|navigation|uiMode|fontScale">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- black theme: Android's starting window drew the default theme's grey for a second before the poster (3 Nov) -->
+        <activity
+            android:name=".HomeActivity"
+            android:exported="true"
+            android:label="@string/wall_name"
+            android:launchMode="singleTask"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
+            android:configChanges="density|screenSize|smallestScreenSize|screenLayout|orientation|keyboard|keyboardHidden|navigation|uiMode|fontScale">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Off by default, so installing this never changes Home. Turning it on is a decision for the owner:
+             pm enable dev.designyourtv/.HomeAlias (undo: pm disable). -->
+        <activity-alias
+            android:name=".HomeAlias"
+            android:targetActivity=".HomeActivity"
+            android:enabled="false"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- A website driven by the remote: claude.ai's desktop site (the Claude tile opens it while the Android app
+             can't install on Android 11). -->
+        <activity
+            android:name=".WebApp"
+            android:exported="false"
+            android:label="@string/tile_name"
+            android:launchMode="singleTask"
+            android:taskAffinity="dev.designyourtv.web"
+            android:windowSoftInputMode="adjustResize"
+            android:configChanges="density|screenSize|smallestScreenSize|screenLayout|orientation|keyboard|keyboardHidden|navigation|uiMode|fontScale" />
+
+        <service android:name=".DensityGuardService" android:exported="false" />
+
+        <!-- The TV's own now playing (Spotify Connect and the rest) for the wallpaper's card. A notification listener only
+             because Android shows other apps' media sessions to listeners; it reads no notifications. Off until allowed
+             over adb: cmd notification allow_listener dev.designyourtv/dev.designyourtv.NowPlaying -->
+        <service
+            android:name=".NowPlaying"
+            android:exported="true"
+            android:label="@string/np_name"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+        <!-- Home opens the wallpaper, Google TV stays Android's Home so casting keeps working. Off until
+             enabled over adb: settings put secure enabled_accessibility_services dev.designyourtv/.HomeKeyService -->
+        <service
+            android:name=".HomeKeyService"
+            android:exported="true"
+            android:label="@string/a11y_name"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data android:name="android.accessibilityservice" android:resource="@xml/home_key_service" />
+        </service>
+
+        <!-- HomeAlias on/off from adb (the shell holds WRITE_SECURE_SETTINGS; ordinary apps can't): Android 11 refuses
+             "pm enable" on another app's component. -->
+        <receiver android:name=".HomeToggle" android:exported="true" android:permission="android.permission.WRITE_SECURE_SETTINGS">
+            <intent-filter>
+                <action android:name="dev.designyourtv.HOME" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".BootReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>

@@ -1,0 +1,20 @@
+[
+  {
+    "id": "phone",
+    "name": "My phone",
+    "label": "Phone",
+    "connect": "192.168.1.78:5555",
+    "model": "<ro.product.model>",
+    "device": "<ro.product.device>",
+    "reminder": true
+  },
+  {
+    "id": "phone2",
+    "name": "Second phone",
+    "serial": "<adb serial>",
+    "model": "<ro.product.model>",
+    "device": "<ro.product.device>",
+    "wearables": true,
+    "readOnly": true
+  }
+]

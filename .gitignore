@@ -1,0 +1,35 @@
+# Art: bring your own. Only the placeholder plates drawn by tools/make-placeholder.py are published.
+plates/*
+!plates/placeholder.*
+!plates/placeholder-dawn.*
+plates-4k/
+masters/
+refs/
+icons/
+models/
+
+# Everything personal and everything the hub writes
+hub/state/
+hub/cache/
+data/
+devices/
+
+# Builds and signing keys
+apk/
+*.jks
+*.keystore
+*.apk
+*.idsig
+
+# Secrets
+.env
+.env.*
+*.key
+
+# Tooling
+node_modules/
+__pycache__/
+*.pyc
+*.log
+.DS_Store
+Thumbs.db
