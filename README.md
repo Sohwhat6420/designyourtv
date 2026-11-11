@@ -1,5 +1,10 @@
 # designyourtv
 
+[![test](https://github.com/Sohwhat6420/designyourtv/actions/workflows/test.yml/badge.svg)](https://github.com/Sohwhat6420/designyourtv/actions/workflows/test.yml)
+![licence: MIT](https://img.shields.io/badge/licence-MIT-blue)
+![Google TV and Android TV](https://img.shields.io/badge/Google%20TV-Android%20TV-3DDC84?logo=android&logoColor=white)
+![Node 22](https://img.shields.io/badge/node-22-339933?logo=nodedotjs&logoColor=white)
+
 A painted lock screen for an Android TV / Google TV. The clock sits *behind* the painting's subject, glass widgets
 float over it, and a dock of apps rises the moment you touch the remote. One small hub on your LAN feeds it, and a
 setup page in any browser decides what it shows.

@@ -1,0 +1,21 @@
+name: test
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Hub (config, SSE, net guard, readers, TV power, static files)
+        shell: bash
+        run: node --test hub/test/*.test.mjs
+      - name: tv-guard (what may run on the TV, and when)
+        shell: bash
+        run: node --test tools/test/*.test.mjs
+      - name: tv-apply against an in-process fake TV
+        run: node tools/tv-apply.mjs --selftest
