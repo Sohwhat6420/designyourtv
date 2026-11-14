@@ -3484,10 +3484,11 @@ function paintAodClock(d = new Date()) {
   const o = amb.from || (amb.from = [x, y]), glassy = dk.mat === "glass";
   const ax = glassy ? 0 : x - o[0], ay = glassy ? 0 : y - o[1];
   const key = `${dk.i}|${dk.text}|${ax.toFixed(1)},${ay.toFixed(1)}|${stW()}x${stH()}`;
-  if (key === amb.key) return; amb.key = key;
+  if (key === amb.key) return;
   stage.style.setProperty("--ax", ax.toFixed(1) + "px"); stage.style.setProperty("--ay", ay.toFixed(1) + "px");
   const sr = stage.getBoundingClientRect(), r = dk.time.getBoundingClientRect();
-  if (!sr.width || !sr.height || !r.width) return;
+  if (!sr.width || !sr.height || !r.width) return;   // nothing laid out yet: the next tick tries again
+  amb.key = key;
   // a little round the digits, never over the matte
   const pad = sr.width * .012, mt = parseFloat(getComputedStyle($("#matte")).borderTopWidth) || 0;
   const pc = (v, of) => (Math.max(mt, v) / of * 100).toFixed(2) + "%";
