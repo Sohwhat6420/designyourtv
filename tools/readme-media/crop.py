@@ -3,7 +3,7 @@ crops, scales and encodes.
 
     python tools/readme-media/crop.py <stills dir> <slides dir> [<assets dir>]
 
-  assets/depth-closeup.webp   the clock and the nearer jet on Raptors over Alaska, from the 2x frame (1980 x 1114)
+  assets/depth-closeup.webp   the date, the clock and the nearer jet on Raptors over Alaska, from the 2x frame (1980 x 1200)
   assets/clocks.webp          the four paintings' clocks, 2 x 2, from the 2x frames
   assets/dock.webp            the dock up over F-22 against the thunderhead, sliding away, and rising again (25 fps)
   docs/screens/setup.webp     the setup page, its empty side margins trimmed
@@ -19,32 +19,34 @@ os.makedirs(slides, exist_ok=True); os.makedirs(assets, exist_ok=True)
 meta = json.load(open(os.path.join(src, "stills.json")))
 W, H = 1920, 1080
 
-# the depth close-up: 1x box (470, 85)-(1460, 642), between the card columns, with room above the digits; 2x frame
+# the depth close-up: 1x box (470, 40)-(1460, 640), between the card columns, from the date to the digits' feet; 2x frame
+BOX = (940, 80, 2920, 1280)
 im = Image.open(os.path.join(src, "rest-f22-alaska.png")).convert("RGB")
-im.crop((940, 170, 2920, 1284)).save(os.path.join(assets, "depth-closeup.webp"), quality=92, method=6)
+im.crop(BOX).save(os.path.join(assets, "depth-closeup.webp"), quality=92, method=6)
 
 # the four clocks: the same box on each painting, 2 x 2 with clear gaps
-tiles = [Image.open(os.path.join(src, "rest-%s.png" % p)).convert("RGB").crop((940, 170, 2920, 1284)).resize((960, 540), Image.LANCZOS)
+tiles = [Image.open(os.path.join(src, "rest-%s.png" % p)).convert("RGB").crop(BOX).resize((960, 582), Image.LANCZOS)
          for p in ("f22-alaska", "f22-thunderhead", "placeholder", "placeholder-dawn")]
 G = 16
-grid = Image.new("RGBA", (960 * 2 + G, 540 * 2 + G), (0, 0, 0, 0))
+grid = Image.new("RGBA", (960 * 2 + G, 582 * 2 + G), (0, 0, 0, 0))
 for k, t in enumerate(tiles):
-    grid.paste(t, ((k % 2) * (960 + G), (k // 2) * (540 + G)))
+    grid.paste(t, ((k % 2) * (960 + G), (k // 2) * (582 + G)))
 grid.save(os.path.join(assets, "clocks.webp"), quality=88, method=6)
 
-# the setup page, without its empty side margins
+# the setup page, without its empty side margins, down to the painting's own controls (the strip of paintings below
+# them has a label overlap of its own, and a floating bar sits in its corner)
 docs = os.path.join(assets, "..", "docs", "screens")
 if os.path.exists(os.path.join(src, "setup.png")) and os.path.isdir(docs):
-    Image.open(os.path.join(src, "setup.png")).convert("RGB").crop((200, 0, 1720, 1080)).save(os.path.join(docs, "setup.webp"), quality=88, method=6)
+    Image.open(os.path.join(src, "setup.png")).convert("RGB").crop((200, 0, 1720, 815)).save(os.path.join(docs, "setup.webp"), quality=88, method=6)
 
 # the dock: the region it and the music card move through, starting on the dock up (the first frame is the still
 # a page shows before it plays); the top edge fades a little, as it cuts through the digits and the pace card
-box = (520, 600, 1830, 1080)
+box = (520, 668, 1830, 1080)                         # from just above the raised music card
 d = [(x["f"], x["ms"]) for x in meta["dock"]]
 up = d.index(("dock-up.png", 2400))
 seq = d[up:] + [("dock-000.png", 1400)] + d[1:up]
 fade = Image.linear_gradient("L").resize((box[2] - box[0], box[3] - box[1]))      # 0 at the top, 255 at the bottom
-fade = fade.point(lambda v: 255 - max(0, int(150 * (1 - v / 255 * (box[3] - box[1]) / 110))))
+fade = fade.point(lambda v: 255 - max(0, int(110 * (1 - v / 255 * (box[3] - box[1]) / 60))))
 shade = Image.new("RGB", fade.size, (8, 9, 12))
 frames = [Image.composite(Image.open(os.path.join(src, f)).convert("RGB").crop(box), shade, fade) for f, _ in seq]
 frames[0].save(os.path.join(assets, "dock.webp"), save_all=True, append_images=frames[1:], duration=[ms for _, ms in seq],

@@ -57,7 +57,7 @@ mocked up or generated. The scripts are in [`tools/readme-media/`](../tools/read
 
 | File | Made by | How |
 | --- | --- | --- |
-| `assets/tv-loop.webp`, `.gif` | `film-loop.mjs`, `encode.py` | The two F-22 paintings in rotation (`config.loop.json`): one unfilmed lap, then a filmed lap, each change stepped through at 25 frames a second with the page's own `?measure` hooks (`__swapAt`, `__seek`), so every frame is where the real change stands at that moment. WebP at 1920 × 1080 (LOOPWEBP); GIF at 960 × 540 and 12.5 frames a second (LOOPGIF). |
+| `assets/tv-loop.webp`, `.gif` | `film-loop.mjs`, `encode.py` | The two F-22 paintings in rotation (`config.loop.json`): one unfilmed lap, then a filmed lap, each change stepped through at 25 frames a second with the page's own `?measure` hooks (`__swapAt`, `__seek`), so every frame is where the real change stands at that moment. WebP at 1920 × 1080 (5.1 MB); GIF at 960 × 540 and 12.5 frames a second (6.1 MB). |
 | `assets/depth-closeup.webp` | `film-stills.mjs`, `crop.py` | Raptors over Alaska at 2x (3840 × 2160), cropped between the two columns of cards. |
 | `assets/clocks.webp` | `film-stills.mjs`, `crop.py` | The same crop from each of the four paintings at 2x, scaled to half and set 2 × 2. |
 | `assets/widgets-*.svg` | `film-stills.mjs`, `crop.py`, `cards.py` | Each card in a 16:10 crop of a 2x frame. Around the card the same frame is softened and darkened, never removed or redrawn. The rotation is CSS only, on the profile README's scheme. |
