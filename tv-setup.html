@@ -464,6 +464,7 @@ html.lite .remind { -webkit-backdrop-filter: none; backdrop-filter: none; backgr
 .cw-t:empty { display: none; }
 .cw-t.out { color: #ffb340; }
 .cw-t:not(.out):not(.nw)::before { content: "resets in "; }
+.cw-t.at:not(.out)::before { content: "resets "; }   /* "Fri 10:00" is a time, not a duration */
 .cw-r b { grid-column: 3; grid-row: 1; font-weight: 700; text-align: right; }
 /* Claude Code activity under the limits (the owner's 3 Nov ask): the laptop dock's heatmap, the last 22 weeks, Monday at the top */
 .cwh { position: absolute; right: 2.4cqw; top: 10.2cqw; width: var(--rc-w, 14.2cqw); padding: .95cqw 1.15cqw .9cqw; border-radius: var(--rc-r, 1.4cqw); color: #fff; font-family: var(--ui);
@@ -4444,7 +4445,7 @@ function paintClaude() {
     const isNew = !out && !/\d/.test(r.reset || "");            // the hub says "new" before a session has started
     const txt = out ? `out ~${day}${hm12(out)}` : isNew ? "new window" : r.reset;
     if (!t.textContent !== !txt) chg = true;
-    t.textContent = txt; t.classList.toggle("out", !!out); t.classList.toggle("nw", isNew);
+    t.textContent = txt; t.classList.toggle("out", !!out); t.classList.toggle("nw", isNew); t.classList.toggle("at", !out && !isNew && /^[A-Za-z]{3}\b/.test(txt));
   }
   for (const [id, r] of [["#ldS", CLAUDE_USE.session], ["#ldW", CLAUDE_USE.weekly]]) {  // the laptop dock: the dock's own thresholds, 70 and 90
     const el = $(id); if (!el) continue;
