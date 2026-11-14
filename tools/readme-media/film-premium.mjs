@@ -127,8 +127,9 @@ try {
     await page.waitForTimeout(3500);
     await page.screenshot({ path: path.join(OUT, "aod-steady.png") });
     meta.aod = await page.evaluate(() => ({ cls: document.querySelector("#stage").className, anims: document.getAnimations().filter(a => !(a instanceof CSSTransition) && a.playState === "running").length,
-      time: document.querySelector("#ambTime").textContent, date: document.querySelector("#ambDate").textContent,
-      depth: !document.querySelector("#stage").classList.contains("amb-flat"), cover: typeof amb === "object" && amb.cover != null ? Math.round(amb.cover * 100) / 100 : null }));
+      time: curDk.text, date: curDk.date.textContent, face: curDk.face, mat: curDk.mat,       // the painting's own clock, which AOD keeps
+      depth: S().depth !== "off" && !view.autoPause, clockZ: getComputedStyle(document.querySelector("#decks")).zIndex, fgZ: getComputedStyle(document.querySelector("#fgs")).zIndex,
+      box: ["t", "r", "b", "l"].map(k => document.querySelector("#stage").style.getPropertyValue("--ac-" + k)).join(" ") }));
     await t.hold(2400);
     await t.key("ArrowDown"); await t.frames(16);
     await browser.close();

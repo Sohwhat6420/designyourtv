@@ -133,7 +133,7 @@ script with your own painting and icons, but not reproduce these exact frames fr
 | `hero.jpg` | One frame at 1920 × 1080 with rain in the forecast. |
 | `loop.webp` | The dock raised by an arrow press, focus walked along it, and the dock sent away, stepped through frame by frame; 1280 × 720, 3.9 MB. |
 | `dock.jpg`, `dock-closeup.jpg` | The frame with the dock up, and a crop of the dock from a 2x frame. |
-| `aod.jpg`, `aod.webp` | AOD mode, and the veil coming down and lifting again; the film is 4.5 MB and is linked, not shown inline. |
+| `aod.jpg`, `aod.webp` | AOD mode, and the veil coming down and lifting again; the film is 3.0 MB and is linked, not shown inline. |
 | `night.jpg` | Night on OK. |
 | `depth-closeup.jpg` | A crop of the clock and the painting's subject from a 2x frame. |
 | `card-*.png` | Each card cut from a 2x frame, with the painting behind its glass exactly as drawn. |

@@ -4,11 +4,14 @@ Dates are in Singapore time. The project is pre-1.0, so anything may change betw
 
 ## Unreleased
 
-- **TV: AOD mode keeps the depth effect.** The AOD clock was drawn above everything, so a subject that crossed it went
-  behind the digits. The subject's cut-out now comes up over the AOD clock, darkened to match the painting under the
-  veil, and the date stays above it. The painting's own rule still applies: depth off or paused on a painting, or a
-  subject that would hide more than 38 % of the digits, leaves the clock in front. Checked in headless Chromium (0
-  running animations in AOD, as before); not yet run on a television.
+- **TV: AOD mode keeps the painting's own clock and its depth.** AOD used to hide the painting's clock and draw a small
+  one in the middle of the screen, above everything, so the face, the size and the depth effect were all lost. The
+  painting's clock now stays where it is, in its own face, size and material, dimmed, with the subject's cut-out still
+  in front of it (darkened to match the painting under the veil) and the date above. A painting with depth off or
+  paused keeps its clock in front, as on the home screen; a dark ink turns pale so it shows on the veil. The clock
+  still steps every 4 minutes along the same path, counted from where it stood; the minute changes without a roll.
+  The matte is 1.6 % of the width (it was 4.2 %), so it clears the date line. Checked in headless Chromium (0 running
+  animations in AOD, as before); not yet run on a television.
 - **TV: the music card no longer hides the dock's labels.** With the dock up, the card covered most of the focused
   app's name for every app under it; it now sits 14.4cqw up instead of 11.6cqw.
 - **TV: "resets Fri 10:00"**, not "resets in Fri 10:00", on the Claude limits card.

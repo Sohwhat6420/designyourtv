@@ -81,9 +81,10 @@ Headless Chromium on a 4-core cloud machine with no GPU. Method and raw results:
 
 Always-on display (AOD) mode treats an idle television as a picture on a wall, not a lit screen.
 
-<img src="assets/premium/aod.jpg" width="100%" alt="Always-on display mode: a near-black matte around the painting, the painting itself under a dark veil so the Concorde is only just visible, and one dim clock reading 10:47 with the date beneath it. No widgets, no dock.">
+<img src="assets/premium/aod.jpg" width="100%" alt="Always-on display mode: a thin near-black matte around the painting, the painting under a dark veil so the Concorde is only just visible, and the painting's own tall clock reading 10:47, in the same place and at the same size as on the home screen, dimmed, with the Concorde's forward fuselage passing in front of the foot of the 1 and the 0. The date sits above it. No widgets, no dock.">
 
-<sub>AOD mode, captured from the page: a matte, the painting under a veil, one dim clock, and 0 running animations.
+<sub>AOD mode, captured from the page: a matte, the painting under a veil, its own clock dimmed where it stood, and 0
+running animations.
 <a href="assets/premium/aod.webp">Watch it come down and wake again (9 s)</a>.</sub>
 
 <picture>
@@ -94,15 +95,16 @@ Always-on display (AOD) mode treats an idle television as a picture on a wall, n
 <sub>Timings from the page's code; time is not drawn to scale. The inset is the clock's real path over three hours.</sub>
 
 It arms after 30 minutes without a key press, or after 2 minutes between 23:00 and 07:00. The widgets and the dock
-leave, the backlight drops to 1 of the panel's 100 (a setting, from 1 to 35), and every animation stops. The one thing
-left is a dim clock, and it does not sit still: every 4 minutes it steps to the next point on a slow path, with no
+leave, the backlight drops to 1 of the panel's 100 (a setting, from 1 to 35), and every animation stops. What is left
+is the painting's own clock: the same face, the same size, the same place, dimmed, with the subject still passing in
+front of the digits (a painting with depth off or paused keeps its clock in front, as on the home screen). It does
+not sit quite still: every 4 minutes it steps to the next point on a slow path, with no
 motion in between, the kind of guard television makers build in against burn-in. Between midnight and 07:00, after
 3 hours idle and with nothing playing, the panel itself goes dark. Any key wakes it, and that key does nothing else,
 so a press in the dark never opens something by accident. It comes back faster (1.1 s) than it went (2.6 s).
 
-Where a painting's subject crosses that clock, the subject still passes in front of the digits, as it does on the home
-screen, and the date stays above it. In the picture above the clock sits clear of the aircraft, so there is nothing to
-pass. This part was added on 14 Nov 2026 and checked in a desktop browser, not yet on the television.
+Until 14 Nov 2026 AOD mode swapped that clock for a small one in the middle of the screen, which lost the depth
+effect. Keeping the painting's own clock was checked in a desktop browser, not yet on the television.
 
 What this saves in watts was never measured (there was no meter on the plug), and neither was the effect on burn-in,
 so this page gives the backlight levels and the mechanisms and stops there.
@@ -111,7 +113,7 @@ so this page gives the backlight levels and the mechanisms and stops there.
 
 ### The clock stands behind the subject, until that would cost you the time
 
-<img src="assets/premium/depth-closeup.jpg" width="100%" alt="Close up of the clock: tall pale digits 10:4 over a dark blue painted sky, with the nose of the Concorde passing in front of the foot of the 1 and the 0, and rain streaks drawn over both.">
+<img src="assets/premium/depth-closeup.jpg" width="100%" alt="Close up of the clock: tall pale digits 10:4 over a dark blue painted sky, with the forward fuselage of the Concorde passing in front of the foot of the 1 and the 0, and rain streaks drawn over both.">
 
 The digits are a layer inside the painting: the aircraft passes in front of them and the rain falls over both. A
 clock still has to be readable from across a room, so before drawing it the page measures how much of the digits the
@@ -253,7 +255,7 @@ TV follows as you save. The TV only ever shows the configuration; it never chang
 
 - **Night on OK.** On the painting, OK drops one dark veil over everything and holds the backlight low; the widgets
   stay readable and nothing animates.
-- **Always-on display.** After a quiet spell the TV dims to a matte, a veiled painting and one dim clock.
+- **Always-on display.** After a quiet spell the TV dims to a matte, a veiled painting and its own clock, dimmed.
 - **Per-app brightness.** Music apps sit at a mid backlight (70 of 100), films keep yours, and a screen-off button in
   the dock turns the panel dark while the music plays on.
 - **Fast opens.** The page's scripts pause whenever another app is in front, so the TV spends nothing on a wallpaper
