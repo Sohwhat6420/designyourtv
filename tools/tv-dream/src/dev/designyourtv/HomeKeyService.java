@@ -193,14 +193,21 @@ public class HomeKeyService extends AccessibilityService {
         if (u != null && u.known()) { frontPkg = u.pkg(); frontCls = u.cls(); }
     }
 
-    /** Keep this service switched on: the TV dropped it once (3 Nov evening: the setting read null, so Home went to Google
-     *  TV again). We hold WRITE_SECURE_SETTINGS for the density switch; called at boot, after an update and from Home. */
+    /** The owner asked for the Home button (tv-apply --home-key on): see HomeToggle. Off on a fresh install. */
+    static boolean keep(Context c) { return c.getSharedPreferences("homekey", Context.MODE_PRIVATE).getBoolean("keep", false); }
+
+    /** Keep this service switched on once the owner chose it: the TV dropped it once (3 Nov evening: the setting read null,
+     *  so Home went to Google TV again). We hold WRITE_SECURE_SETTINGS for the density switch; called at boot, after an
+     *  update and from Home. Never switches the service on by itself: a fresh install, or the owner turning it off in
+     *  Settings, stays as the owner left it. */
     static void ensure(Context c) {
         try {
             String me = c.getPackageName() + "/." + HomeKeyService.class.getSimpleName();
             String cur = android.provider.Settings.Secure.getString(c.getContentResolver(), android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+            dev.designyourtv.core.A11yList.Plan plan = dev.designyourtv.core.A11yList.plan(cur, me, keep(c));
+            if (plan == dev.designyourtv.core.A11yList.Plan.NONE) return;
+            if (plan == dev.designyourtv.core.A11yList.Plan.REVIVE) { revive(c, me, cur); return; }
             String next = dev.designyourtv.core.A11yList.with(cur, me);
-            if (next == null) { revive(c, me, cur); return; }
             android.provider.Settings.Secure.putString(c.getContentResolver(), android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, next);
             android.provider.Settings.Secure.putInt(c.getContentResolver(), android.provider.Settings.Secure.ACCESSIBILITY_ENABLED, 1);
             Log.i(Density.TAG, "Home button service switched back on (was: " + cur + ")");

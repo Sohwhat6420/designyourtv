@@ -419,6 +419,9 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const hub = await createHub();
   hub.log("info", `hub ${VERSION} listening on 0.0.0.0:${hub.port} (pid ${process.pid})`);
   console.log(`tv-hub ${VERSION} on http://0.0.0.0:${hub.port}  lan ${lanIps().join(", ")}  pid ${process.pid}`);
+  // the two first-run surprises on a real TV: a firewall that drops the TV's request, and an APK built for another address
+  console.log(`build the TV's APK with one of: ${lanIps().map(ip => `--hub http://${ip}:${hub.port}`).join("  ") || "(no LAN address found)"}`);
+  if (process.platform === "win32") console.log("if the TV shows the clock and date but no widgets, allow Node.js through Windows Firewall on Private networks");
   process.on("uncaughtException", e => hub.log("error", `uncaught: ${e.stack?.split("\n").slice(0, 3).join(" ")}`));
   process.on("unhandledRejection", e => hub.log("error", `unhandled: ${String(e?.stack || e).split("\n").slice(0, 3).join(" ")}`));
   const bye = () => hub.close().finally(() => process.exit(0));

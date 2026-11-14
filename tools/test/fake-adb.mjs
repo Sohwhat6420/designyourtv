@@ -274,7 +274,7 @@ if (c === "dumpsys dreams") out(`DreamManager:\n  mCurrentDream=null\n  screensa
 if (c === "dumpsys display") out(`DISPLAY MANAGER (dumpsys display)\n  mDefaultDisplay: 1920 x 1080, 60.0 fps, density ${tv.density.override || tv.density.physical}\n`);
 if (c === "dumpsys meminfo") out(`Total RAM: 2,000,000K\n Free RAM: ${memAvailKB()}K\n`);
 if (c === "dumpsys media_session") out("MEDIA SESSION SERVICE (dumpsys media_session)\n  Sessions Stack - have 0 sessions:\n");
-if (c === 'dumpsys power | grep -m1 mWakefulness=; dumpsys activity activities | grep -E "mResumedActivity|mFocusedApp"') out(`mWakefulness=Awake
+if (c === 'dumpsys power | grep -m1 mWakefulness=; dumpsys activity activities | grep -E "mResumedActivity|mFocusedApp"') out(`mWakefulness=${st.wakefulness || "Awake"}
   mResumedActivity: ActivityRecord{abc u0 ${st.foreground || homeNow()} t12}
   mFocusedApp=ActivityRecord{abd u0 ${st.foreground || homeNow()} t12}
 `);

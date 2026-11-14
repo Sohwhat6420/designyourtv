@@ -185,6 +185,13 @@ public final class CoreTest {
         check("a11y without: other services kept in order, either spelling of ours dropped",
             "a.b/.X:c.d/.Y".equals(A11yList.without("a.b/.X:" + svc + ":c.d/.Y", svc))
             && "a.b/.X".equals(A11yList.without("a.b/.X:dev.designyourtv/dev.designyourtv.HomeKeyService", svc)));
+        check("a11y plan: a fresh install (nothing listed, owner never asked) switches nothing on",
+            A11yList.plan(null, svc, false) == A11yList.Plan.NONE && A11yList.plan("a.b/.X", svc, false) == A11yList.Plan.NONE);
+        check("a11y plan: turned off in Settings stays off unless the owner asked to keep it",
+            A11yList.plan("null", svc, false) == A11yList.Plan.NONE && A11yList.plan("null", svc, true) == A11yList.Plan.ADD);
+        check("a11y plan: listed (either spelling) is only ever revived, never rewritten",
+            A11yList.plan(svc, svc, false) == A11yList.Plan.REVIVE
+            && A11yList.plan("a.b/.X:dev.designyourtv/dev.designyourtv.HomeKeyService", svc, true) == A11yList.Plan.REVIVE);
 
         // --- usage-log foreground (HomeKeyService follows Google TV's home only while it is verifiably in front)
         UsageFront uf = new UsageFront();
