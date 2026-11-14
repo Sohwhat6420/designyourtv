@@ -213,8 +213,9 @@ html.booting .stage :is(.cw, .cwh, .ud, .widgets > div) { transition: none !impo
    use transitions, which end by themselves */
 .stage:is(.dim, .amb) :is(*, *::before, *::after) { animation: none !important; }
 /* the Frame-style matte (the owner's answer to item 43: "Frame style matte + darkened backlight"): a near-black mount around the
-   painting in AOD. Under the veil, over the painting; the widgets are gone in AOD so nothing is clipped. */
-.matte { z-index: 49; pointer-events: none; opacity: 0; box-sizing: border-box; border: 4.2cqw solid #0b0a09; transition: opacity 1600ms cubic-bezier(.4, 0, .2, 1); }
+   painting in AOD. Under the veil, over the painting; the widgets are gone in AOD so nothing is clipped. 1.6cqw since
+   14 Nov (it was 4.2): the painting's own clock stays in AOD, and its date line starts 2.5cqw from the top edge. */
+.matte { z-index: 49; pointer-events: none; opacity: 0; box-sizing: border-box; border: 1.6cqw solid #0b0a09; transition: opacity 1600ms cubic-bezier(.4, 0, .2, 1); }
 .stage.amb .matte { opacity: 1; transition-duration: 2600ms; }
 @media (prefers-reduced-motion: reduce) { .matte, .stage.amb .matte { transition-duration: 400ms; } }
 .scene img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: var(--ox, 50%) 50%; display: block; }
@@ -1001,32 +1002,35 @@ html.lite .remind { -webkit-backdrop-filter: none; backdrop-filter: none; backgr
 .stage.aod .clock { opacity: .9; }
 .stage.aod .datetop { opacity: .85; }
 @media (prefers-reduced-motion: reduce) { .scene img { transition: none; } }
-/* the TV's ambient AOD (nav-ambient prototype, 3 Nov). Not the laptops' .aod look above: state class .amb, layer .amb-l.
-   The painting goes to a whisper under a black veil (opacity only); a dim copy of the clock in the painting's face sits
-   above it and steps a few px along a slow Lissajous path once a minute, with no transition. Slow in, quicker out. */
+/* the TV's ambient AOD (nav-ambient prototype, 3 Nov; its clock redone 14 Nov). Not the laptops' .aod look above: state
+   class .amb. The painting goes to a whisper under a black veil (opacity only) and the painting's own clock stays where
+   it is, in its own face, size and material, dimmed, with the subject still in front of it (the owner, 14 Nov: "why did
+   the clock shrink instead of keeping the same font size and style??"; before, a small copy of the clock sat in the
+   middle of the screen). Slow in, quicker out. */
 #veilAmb { z-index: 50; transition: opacity 1100ms cubic-bezier(.25, .6, .3, 1); }   /* waking: rides the 700 ms backlight glide */
 .stage.amb #veilAmb { opacity: var(--amb-veil, .84); transition: opacity 2600ms cubic-bezier(.4, 0, .2, 1); }
-/* the painting's own clock goes, and with it everything the prototype's stage did not have: only the painting is left */
-.stage.amb :is(#decks, #dates, #glass, .widgets, .cw, .cwh, .ud, .anclock, .np, .scrim, .mclock) { opacity: 0 !important; transition: opacity 1600ms cubic-bezier(.4, 0, .2, 1); }
+/* everything the prototype's stage did not have goes: the painting and its clock are left */
+.stage.amb :is(.widgets, .cw, .cwh, .ud, .anclock, .np, .scrim, .mclock) { opacity: 0 !important; transition: opacity 1600ms cubic-bezier(.4, 0, .2, 1); }
 .stage.amb .dock { opacity: 0; pointer-events: none; }
-.amb-l { z-index: 51; pointer-events: none; opacity: 0; transition: opacity 420ms ease-out; }
-.stage.amb .amb-l { opacity: 1; transition: opacity 2400ms cubic-bezier(.4, 0, .2, 1) 900ms; }
-/* 14 Nov (the owner: "the AOD mode removes the depth effect"): the subject keeps its place in front of the AOD clock.
-   The cut-outs come up over the clock, darkened by exactly what the veil takes from the painting (1 - veil), so the
-   subject looks as it does under the veil. They are shown only in a box around the clock: everywhere else the same
-   pixels are already in the painting below, and the box keeps them off the matte and the fading widgets. The date is a
-   second layer above them (.amb-dl), so a subject never hides it, as on the painting's own clock. No keyframes: one
-   transition, in step with the veil, then nothing moves. Waking drops it at once, under the veil.
-   .amb-flat (ambDepth): depth is off or paused on this painting, or the subject would hide too much of this clock. */
-.stage.amb:not(.amb-flat) #fgs { z-index: 52; filter: brightness(calc(1 - var(--amb-veil, .84))); clip-path: inset(calc(40% - 9cqw) 16cqw calc(60% - 6.5cqw) 16cqw); transition: filter 2600ms cubic-bezier(.4, 0, .2, 1); }
-.amb-dl { z-index: 53; }
-.amb-l:not(.amb-dl) .amb-d, .amb-dl .amb-t { visibility: hidden; }   /* both layers hold both lines, so they lay out alike */
-@media (prefers-reduced-motion: reduce) { .stage.amb:not(.amb-flat) #fgs { transition-duration: 400ms; } }
-.amb-orbit { position: absolute; left: 50%; top: 40%; }
-.amb-clock { position: absolute; left: 0; top: 0; translate: -50% -50%; display: grid; justify-items: center; gap: 1.2cqw; white-space: nowrap; color: var(--ink); }
-.amb-t { font-size: 13cqw; line-height: .8; font-variant-numeric: tabular-nums; opacity: .34; }
-.amb-d { font: 500 1.15cqw/1 var(--ui); letter-spacing: .14em; text-transform: uppercase; opacity: .26; }
-@media (prefers-reduced-motion: reduce) { #veilAmb, .stage.amb #veilAmb, .amb-l, .stage.amb .amb-l { transition-duration: 400ms; transition-delay: 0s; } }
+/* The clock, the cut-outs and the date come up over the veil, in the order they have on the painting. The clock and the
+   date are dimmed by opacity. The cut-outs are darkened by exactly what the veil takes from the painting (1 - veil), so
+   the subject looks as it does under the veil, and are shown only in a box round the digits (--ac-*, paintAodClock):
+   everywhere else the same pixels are already in the painting below, and the box keeps them off the matte and the
+   widgets while those fade. A painting with depth off or paused hides its cut-out itself (.fg.hidden), as on the home
+   screen. --ax/--ay: the burn-in step (paintAodClock). No keyframes: transitions in step with the veil, then nothing
+   moves. Waking drops all of it at once, under the veil. */
+.stage.amb :is(#decks, #glass) { z-index: 51; opacity: var(--amb-clock, .62); transition: opacity 2600ms cubic-bezier(.4, 0, .2, 1); }
+.stage.amb #fgs { z-index: 52; filter: brightness(calc(1 - var(--amb-veil, .84))); clip-path: inset(var(--ac-t, 0%) var(--ac-r, 0%) var(--ac-b, 0%) var(--ac-l, 0%)); transition: filter 2600ms cubic-bezier(.4, 0, .2, 1); }
+.stage.amb #dates { z-index: 53; opacity: var(--amb-date, .5); transition: opacity 2600ms cubic-bezier(.4, 0, .2, 1); }
+.stage.amb :is(#decks, #dates) { translate: var(--ax, 0px) var(--ay, 0px); }
+/* a dark ink (a bright painting's) would vanish on the veil: it takes a pale one, drawn plainly */
+.stage.amb .clock { transition: color 2600ms cubic-bezier(.4, 0, .2, 1); }
+.stage.amb .clock.ink-dark { --ink: #dfe5ee !important; --halo: none !important; }
+.stage.amb .m-ghost.ink-dark .time { mix-blend-mode: normal; }
+.stage.amb.amb-pale .datetop { color: #dfe5ee !important; text-shadow: none !important; }
+/* the full-screen music view hides the clock; in AOD the clock is the one thing shown (its cut-out stays hidden there) */
+.stage.amb.mfull-on :is(.clock, .datetop, #glass) { opacity: 1 !important; }
+@media (prefers-reduced-motion: reduce) { #veilAmb, .stage.amb #veilAmb, .stage.amb :is(#decks, #glass, #dates, #fgs, .clock) { transition-duration: 400ms; } }
 /* the weather layer (nav-ambient prototype, 3 Nov), between the painting and the clock (so behind the depth cut-out too).
    Every particle is a small element on its own compositor layer, moved by a CSS animation (transform only), so the
    main thread does nothing while it rains. The keyframes are quantised to WX_FPS with steps(), all on one shared
@@ -1518,8 +1522,6 @@ textarea::placeholder, input::placeholder { color: #666b73; }
             <div class="layer veil" id="veilAll" aria-hidden="true"></div>
             <div class="layer matte" id="matte" aria-hidden="true"></div>
             <div class="layer veil" id="veilAmb" aria-hidden="true"></div>
-            <div class="layer amb-l" id="ambL" aria-hidden="true"><div class="amb-orbit" id="ambOrbit"><div class="amb-clock" id="ambClock"><b class="amb-t time" id="ambTime">--:--</b><span class="amb-d"></span></div></div></div>
-            <div class="layer amb-l amb-dl" id="ambDL" aria-hidden="true"><div class="amb-orbit"><div class="amb-clock"><b class="amb-t time">--:--</b><span class="amb-d" id="ambDate"></span></div></div></div>
             <div class="wash" id="wash" aria-hidden="true"><div class="wash-disc" id="washDisc"></div><div class="wash-ic" id="washIc"></div><span class="wash-bar"><i></i></span></div>
             <p class="launch" id="launch" aria-live="polite"></p>
             <div class="credit" id="credit"></div>
@@ -2958,9 +2960,6 @@ function applyStage(swapping) {
   fgsEl.querySelectorAll(".fg").forEach(f => f.classList.toggle("hidden", +f.dataset.i === view.i && s.depth === "off"));   // placeClock may also pause it
   $("#dock").classList.toggle("light", p.mode === "dark");     // a bright painting gets light glass with dark text
   stage.classList.toggle("wx-dark", p.mode === "dark");           // and its rain is drawn as dark wet glints
-  document.querySelectorAll(".amb-l .amb-clock").forEach(e => { e.className = "amb-clock f-" + s.face; });
-  // the AOD clock sits on a black veil: a dark ink (a bright painting's) would vanish there, so it takes a pale one instead
-  { const ink = inkOf(p, s), pale = /^#[0-9a-f]{6}$/i.test(ink) && Lum(hexRgb(ink)) < .3 ? "#dfe5ee" : ink; document.querySelectorAll(".amb-l").forEach(e => e.style.setProperty("--ink", pale)); }
   ensure(view.i);
   layLensSoon(layLens.i != null && view.i !== layLens.i); layLens.i = view.i;   // a new painting cross-fades the laptop dock's glass
   if (!swapping) requestAnimationFrame(() => placeClock());
@@ -3450,8 +3449,9 @@ function wxPaint() {
 }
 WX_REDUCED.addEventListener?.("change", wxPaint);
 /* ---------------- the TV's ambient AOD (nav-ambient prototype, 3 Nov) ----------------
-   After a long while with no key (or soon, inside the night window) the painting goes to a whisper and a dim clock
-   drifts a few px once a minute; any key wakes it and does nothing else. The TV only: the laptops keep their own AOD.
+   After a long while with no key (or soon, inside the night window) the painting goes to a whisper and its clock stays,
+   dimmed, stepping a few px every 4 minutes; any key wakes it and does nothing else. The TV only: the laptops keep
+   their own AOD.
    ?aodIdle=<s>, ?nightIdle=<s> and ?nightFrom=<h>&nightTo=<h> override the limits (for testing). */
 const AQ = new URLSearchParams(location.search);
 const AOD_IDLE_MS = (+AQ.get("aodIdle") || 30 * 60) * 1e3;           // no key for this long: AOD
@@ -3473,29 +3473,31 @@ function armAod() {
   const wait = Math.min(need - idle, inNight(new Date(now)) ? Infinity : msToHour(AOD_NIGHT.from, now) + 1e3);
   amb.timer = setTimeout(armAod, Math.min(wait, 2 ** 31 - 1));
 }
+/* The AOD's guard against burn-in, and the box the cut-outs show in. Every 4 minutes (the plan's 3-5) the clock steps to
+   the next point of a slow path, with no transition, so nothing animates. The path is measured from where the clock
+   sat when the AOD came, so it does not jump as the veil comes down. The liquid-glass clock keeps to the home screen's
+   4 px orbit: its canvas draws from the digits' measured places. Written only on a change. */
 function paintAodClock(d = new Date()) {
-  // the time and the date are on two layers (the subject passes between them), each holding both lines; written only on a change
-  const put = (sel, v) => document.querySelectorAll(sel).forEach(e => { if (e.textContent !== v) e.textContent = v; });
-  put(".amb-l .amb-t", nowText(false)); put(".amb-l .amb-d", dateText());
-  const m = Math.floor(d.getTime() / AOD_SHIFT_MS) * (AOD_SHIFT_MS / 60e3);   // one step every 4 minutes (the plan's 3-5), no transition: nothing animates
+  const dk = curDk; if (!dk || dk.dead || !dk.time) return;
+  const m = Math.floor(d.getTime() / AOD_SHIFT_MS) * (AOD_SHIFT_MS / 60e3);
   const x = AOD_PATH.rx * Math.sin(2 * Math.PI * m / AOD_PATH.px), y = AOD_PATH.ry * Math.sin(2 * Math.PI * m / AOD_PATH.py + 1);
-  const tf = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
-  document.querySelectorAll(".amb-l .amb-orbit").forEach(e => { if (e.style.transform !== tf) e.style.transform = tf; });
+  const o = amb.from || (amb.from = [x, y]), glassy = dk.mat === "glass";
+  const ax = glassy ? 0 : x - o[0], ay = glassy ? 0 : y - o[1];
+  const key = `${dk.i}|${dk.text}|${ax.toFixed(1)},${ay.toFixed(1)}|${stW()}x${stH()}`;
+  if (key === amb.key) return; amb.key = key;
+  stage.style.setProperty("--ax", ax.toFixed(1) + "px"); stage.style.setProperty("--ay", ay.toFixed(1) + "px");
+  const sr = stage.getBoundingClientRect(), r = dk.time.getBoundingClientRect();
+  if (!sr.width || !sr.height || !r.width) return;
+  // a little round the digits, never over the matte
+  const pad = sr.width * .012, mt = parseFloat(getComputedStyle($("#matte")).borderTopWidth) || 0;
+  const pc = (v, of) => (Math.max(mt, v) / of * 100).toFixed(2) + "%";
+  stage.style.setProperty("--ac-t", pc(r.top - sr.top - pad, sr.height)); stage.style.setProperty("--ac-b", pc(sr.bottom - r.bottom - pad, sr.height));
+  stage.style.setProperty("--ac-l", pc(r.left - sr.left - pad, sr.width)); stage.style.setProperty("--ac-r", pc(sr.right - r.right - pad, sr.width));
 }
-/* May the subject pass in front of the AOD clock? The painting's own rule: not when depth is off or paused on it, and
-   not when the cut-out would hide more than 38 % of these digits (then the clock stays in front, as before 14 Nov). */
-function ambDepth() {
-  const p = P(), i = view.i, off = S().depth === "off" || !!view.autoPause;
-  stage.classList.toggle("amb-flat", off);
-  if (off) return;
-  maskFor(i).then(m => {
-    if (!amb.on || view.i !== i || !m || !m.a) return;
-    const sr = stage.getBoundingClientRect(), r = $("#ambTime").getBoundingClientRect();
-    if (!sr.width || !r.width) return;
-    const fx = v => (v - sr.left) / sr.width * m.w, fy = v => (v - sr.top) / sr.height * m.h;
-    amb.cover = occ(m, fx(r.left), fy(r.top), fx(r.right), fy(r.bottom));
-    stage.classList.toggle("amb-flat", amb.cover > .38 && !p.keepDepth);
-  }).catch(() => {});
+/* a dark date (a bright painting's) would vanish on the veil too */
+function ambInk() {
+  const dk = curDk, c = dk && dk.date ? (getComputedStyle(dk.date).color.match(/[\d.]+/g) || []).slice(0, 3).map(Number) : [];
+  stage.classList.toggle("amb-pale", c.length === 3 && Lum(c) < .3);
 }
 /* the panel's own rest (plan S5 T2, "sleep 00:00-07:00 plus 3 h idle"): in AOD, between midnight and 07:00, after three hours
    with no key, the hub is asked to put the panel dark (awake, backlight 0: the remote still wakes it). Never while something
@@ -3513,10 +3515,14 @@ function setAmb(on) {
   if (on === amb.on) return;
   amb.on = on;
   clearInterval(sleepTimer); sleepTimer = on ? setInterval(sleepCheck, 10 * 60e3) : 0;
-  if (on) { closeDrawer(); inputsClose(); clearTimeout(dockHide); view.dockUp = false; paintDockUp(); washReset(); paintAodClock(); ambDepth(); }
-  else kioskCatchUp(true);                         // waking: the painting the rotation reached goes in, instantly, under the veil
+  if (on) { closeDrawer(); inputsClose(); clearTimeout(dockHide); view.dockUp = false; paintDockUp(); washReset(); amb.from = null; amb.key = ""; ambInk(); paintAodClock(); }
+  else {
+    stage.style.removeProperty("--ax"); stage.style.removeProperty("--ay");   // waking: the clock is back in its own place before anything measures it
+    kioskCatchUp(true);                            // and the painting the rotation reached goes in, instantly, under the veil
+  }
   stage.classList.toggle("amb", on);
   if (on) freezeMotion();
+  else if (curDk && !curDk.dead && curDk.placed && !xfBusy) { measureDeck(curDk); drawGlassSoon(); }   // the places measured in AOD carried its step
   // the backlight glides (700 ms) alongside the veil; night on OK holds the lower of the two, and gets its own back on waking
   if (on) nightBridge(dim.on ? Math.min(globals.nightLevel, aodLevel()) : aodLevel());
   else nightBridge(dim.on ? globals.nightLevel : -1);
@@ -3980,7 +3986,7 @@ function rollDeck(dk, text) {
     const n = mk("span", "g in"); n.textContent = chars[j]; c.win.append(n);
     const old = c.g, h = c.win.offsetHeight, delay = (k++) * 70;
     c.g = n; c.ch = chars[j]; c.rollAt = performance.now();
-    if (reduceMotion()) { old.remove(); n.classList.remove("in"); return; }
+    if (reduceMotion() || amb.on) { old.remove(); n.classList.remove("in"); return; }   // in AOD the minute changes without a roll: nothing animates there
     old.animate([{ transform: "none", opacity: 1 }, { transform: `translateY(${-h * .62}px)`, opacity: 0 }], { duration: 520, delay, easing: E.out, fill: "both" });
     n.animate([{ transform: `translateY(${h * .62}px)`, opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 720, delay, easing: E.expo, fill: "backwards" })
       .finished.then(() => { old.remove(); n.classList.remove("in"); }, () => {});
