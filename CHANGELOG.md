@@ -2,6 +2,16 @@
 
 Dates are in Singapore time. The project is pre-1.0, so anything may change between minor versions.
 
+## Unreleased
+
+- **TV: the music card no longer hides the dock's labels.** With the dock up, the card covered most of the focused
+  app's name for every app under it; it now sits 14.4cqw up instead of 11.6cqw.
+- **README media, all filmed from the real page:** one lap of the rotation with the page's own change, a 2x depth
+  close-up, a rotating card of every glass widget on the painting it sits on, the dock rising and leaving, and banners
+  for the social preview and LinkedIn. `tools/readme-media/` films them with the page's `?measure` hooks and measures
+  the "By the numbers" table ([docs/numbers.md](docs/numbers.md)).
+- **`demo.mjs --config <file>`** starts the demo from your own config.
+
 ## 0.2.0 (14 Nov 2026)
 
 First-run fixes: what a clean install on a Google TV runs into, reproduced against a fake TV and fixed.

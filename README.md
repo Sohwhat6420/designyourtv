@@ -1,4 +1,7 @@
-<img src="docs/hero.webp" width="100%" alt="The clock stands behind the painting: a TV showing an oil painting of two F-22s over snowy mountains at dusk, the clock 10:47 behind the nearer jet, glass widgets either side.">
+<picture>
+  <source srcset="assets/tv-loop.webp" type="image/webp">
+  <img src="assets/tv-loop.gif" width="100%" alt="One lap of the TV's rotation, filmed from the demo: two F-22s over snowy mountains, the clock 10:47 standing behind the nearer jet; the painting dissolves to an F-22 against a thunderhead while each digit wipes into its new face and the glass widgets step back and return in the new palette; then a valley at dusk with tall pale digits behind a tree, a valley at dawn, and back to the jets.">
+</picture>
 
 # designyourtv
 
@@ -9,9 +12,8 @@
 ![Google TV and Android TV](https://img.shields.io/badge/Google%20TV-Android%20TV-3DDC84?logo=android&logoColor=white)
 ![npm dependencies: 0](https://img.shields.io/badge/npm%20dependencies-0-555)
 
-<img src="docs/screens/depth-detail.webp" width="100%" alt="Close up: the serif digits 10:47 sit behind the nearer F-22, whose nose and wing cross in front of the 4 and the 7.">
-
-<sub>Close up: the jet's nose and wing cross in front of the 4 and the 7.</sub>
+<sub>Above: one lap of the demo's rotation, each change the page's own 1.75 s move, filmed frame by frame in headless
+Chromium at the TV panel's 1920 × 1080. Nothing is mocked up: [how it was filmed](docs/numbers.md#how-the-media-is-made).</sub>
 
 - **The clock is a layer of the painting.** Each painting is cut into four layers once, on your own computer, by two
   small models (BiRefNet and Depth Anything V2), and the digits are drawn between the layers. When a foreground would
@@ -20,6 +22,27 @@
   out and says how old it is.
 - **The remote stays in charge.** Any arrow raises a dock of apps; Home brings the painting back. Google TV stays the
   real Home underneath, so casting keeps working.
+
+<img src="assets/depth-closeup.webp" width="100%" alt="Close up, at twice the panel's resolution: solid dark serif digits 10:47 behind the nearer F-22. Its nose and wing pass in front of the 4 and the 7, its tail fin in front of the foot of the 7, and the lower jet's canopy in front of the 1 and the 0.">
+
+<sub>Close up, at 2×: the nearer jet's nose and wing pass in front of the 4 and the 7. This painting uses the
+<i>Tinted</i> clock, which is near solid, so what you see is depth, not see-through digits.</sub>
+
+## By the numbers
+
+| Figure | What it counts |
+| ---: | --- |
+| **164** | tests in CI: 125 for the hub, 31 for tv-guard and a first run against a fake TV, 8 for tv-apply; plus 111 checks of the APK's core logic in every build |
+| **0** | npm dependencies: the hub and every tool use only Node's built-in modules |
+| **0.5&nbsp;%** | of the page's main thread busy at rest, with a song playing: 24 to 27 ms of script a minute |
+| **<&nbsp;3&nbsp;MB** | of JavaScript heap at rest (2.6 and 2.8 MB in two runs) |
+| **~5&nbsp;ms** | of script to plan a painting change; the 1.75 s that follows is transforms and opacity, which the compositor runs |
+| **1.0&nbsp;MB** | for a first load: 963 KB from the hub (the page, the paintings and their cut-outs), 83 KB of fonts |
+| **10** | clock faces, and **4** layers per painting |
+
+<sub>Two runs on 14 Nov 2026 with [`tools/readme-media/measure.mjs`](tools/readme-media/measure.mjs): the demo hub and
+the TV page in headless Chromium on a 4-core cloud machine with no GPU, so these are a browser's costs, not a TV's.
+Method, raw results and what was left out: [docs/numbers.md](docs/numbers.md).</sub>
 
 ## Try it in 30 seconds, no TV needed
 
@@ -34,30 +57,45 @@ no device and nothing on your machine; the page fetches its fonts from Google Fo
 
 ## What it looks like
 
-![A second painting: one F-22 climbing past a storm cloud at sunset, the clock in a lighter serif face](docs/screens/tv-thunderhead.webp)
+### Glass widgets
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/widgets-dark.svg">
+  <img src="assets/widgets-light.svg" width="100%" alt="The TV's glass widgets, one at a time, each shown on the painting it sits on: the calendar on the thunderhead, the next event on the Alaska jets, live bus arrivals and the Claude Code heatmap on the valley at dusk, the battery rings and the music card on the valley at dawn, the Claude limits on the jets and the weekly pace card on the thunderhead.">
+</picture>
+
+Each card's glass takes its colour from the painting behind it, so the same card is blue over the jets and amber over
+the thunderhead. The calendar, the next event from any ICS feed, live bus arrivals (Singapore's LTA DataMall), phone,
+watch and earbud batteries, Claude plan limits and a weekly pace, Claude Code activity, and a music card that follows
+what the TV is playing. The weather is not a card: when the forecast says rain, the TV draws the rain into the painting.
+
+### Every painting has its own clock
 
 Per painting you pick the clock's face (ten, from condensed to didone), its colour (or *auto*, sampled from the
 painting), the material (ghost, liquid glass, tinted), size, stretch, position, and whether hours stack over minutes.
-Changing painting is one 1.7 s move: a slow camera push, the digits cascading into the new face, the widgets stepping
-back and returning in the new palette. Bring your own paintings with [the plate walkthrough](docs/make-a-plate.md).
+Changing painting is one 1.75 s move on the TV: a slow camera push, each digit wiping into the new face as it dips
+behind the subject, the widgets stepping back and returning in the new palette. Bring your own paintings with
+[the plate walkthrough](docs/make-a-plate.md).
 
-![The dock up: the apps on the left island, the app drawer, inputs and settings on the right](docs/screens/tv-dock.webp)
+### A dock you drive with the remote
+
+<img src="assets/dock.webp" width="100%" alt="The dock rising over the thunderhead painting: the music card lifts out of the way, the app tiles rise with Netflix focused and named, then the dock slides away again.">
 
 Press any arrow and the dock rises: your apps on the left, the app drawer, the TV's inputs and settings on the right.
 OK opens an app, fast-forward and rewind step through the paintings, and Home brings the painting back. On the
 painting, OK is a night veil: one dark layer over everything with the backlight held low. After a quiet spell the TV
 dims to an always-on look with the clock still live.
 
-![The TV: an oil painting of two F-22s over snowy mountains at dusk. The clock, 10:47, sits behind the nearer jet; glass widgets either side show the calendar, the next event, buses, batteries, Claude limits and the weather, and a music card sits at the bottom.](docs/screens/tv.webp)
+### The setup page
 
 ![The setup page: the preview with the dock up, the painting's settings beside it](docs/screens/setup.webp)
 
 The setup page, open in any browser on your network, is where you decide what the TV shows. It saves as you go and the
 TV follows as you save. The TV only ever shows the configuration; it never changes it.
 
-<sub>Every screen above is the demo in headless Chromium at a TV panel's 1920 × 1080. App icons are not included (they
-are the apps' own artwork), so the dock shows each app's letter until you add icons: see
-[Configuration](#configuration).</sub>
+<sub>Every picture here is the demo in headless Chromium at a TV panel's 1920 × 1080; the widget cards are cropped from
+those frames and only the card being described is lit. App icons are not included (they are the apps' own artwork), so
+the dock shows each app's letter until you add icons: see [Configuration](#configuration).</sub>
 
 ## Put it on your TV
 
@@ -242,6 +280,8 @@ node --test tools/test/*.test.mjs                    # tv-guard, and a first run
 node tools/tv-apply.mjs --selftest                   # tv-apply against an in-process fake TV, undo round trips included
 JAVA_HOME=/path/to/jdk-17 node tools/build-tv-apk.mjs --test-only   # the APK's core logic on a plain JVM
 ```
+
+That is 125, 31 and 8 tests in CI, and 111 checks of the core logic in every APK build.
 
 ## Privacy and safety
 

@@ -38,7 +38,7 @@ Files that must not exist, checked by path:
 | --- | --- |
 | Keystores, `.env`, `.key`, `.pem`, `.p12` | none |
 | `hub/state/`, `data/`, `devices/`, `plates-4k/`, `masters/`, `refs/`, `icons/`, `models/` | none |
-| Images | only `docs/screens/*` (screenshots of the demo hub), the two placeholder plates drawn by `tools/make-placeholder.py`, and the APK's banner and icon drawn by `tools/tv-dream/make-art.py` (the Claude tile is a drawn "C" monogram, not Anthropic's logo) |
+| Images | only `docs/screens/*` and `assets/*` (screenshots, films and banners of the demo hub, made by `tools/readme-media/`), the two placeholder plates drawn by `tools/make-placeholder.py`, and the APK's banner and icon drawn by `tools/tv-dream/make-art.py` (the Claude tile is a drawn "C" monogram, not Anthropic's logo) |
 
 ### Every remaining match, explained
 

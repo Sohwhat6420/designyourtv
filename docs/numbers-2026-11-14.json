@@ -1,0 +1,188 @@
+{
+ "runs": [
+  {
+   "when": "2026-11-14T12:25:10.483Z",
+   "machine": {
+    "cpus": 4,
+    "model": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "node": "v22.23.4"
+   },
+   "browser": "Chromium 153.0.8010.12 (Playwright, headless, software rendering)",
+   "payload": {
+    "requests": 48,
+    "total_kb": 1045.7,
+    "hub": {
+     "requests": 45,
+     "kb": 963.2,
+     "largest": [
+      [
+       "tv-setup.html?kiosk=tv&measure&start=f22-alaska",
+       449.7,
+       null
+      ],
+      [
+       "plates/f22-alaska.plate.webp",
+       147.1,
+       null
+      ],
+      [
+       "plates/f22-thunderhead.plate.webp",
+       133.6,
+       null
+      ],
+      [
+       "plates/placeholder-dawn.plate.webp",
+       77.1,
+       null
+      ],
+      [
+       "plates/placeholder-dawn.fgall.webp",
+       74.3,
+       null
+      ],
+      [
+       "plates/f22-alaska.subj.webp",
+       57.8,
+       null
+      ]
+     ]
+    },
+    "google_fonts": {
+     "requests": 3,
+     "kb": 82.5
+    }
+   },
+   "idle": {
+    "seconds": 60,
+    "main_thread_busy_pct": 0.5,
+    "script_ms_per_min": 24,
+    "chromium_cpu_pct_all_processes": 65.5,
+    "wakeups_per_min": {
+     "timeout": 5,
+     "interval": 142.9,
+     "animation_frame": 1
+    },
+    "style_recalcs_per_min": 82,
+    "layouts_per_min": 73,
+    "js_heap_used_mb": 2.6,
+    "renderer_pss_mb": 231.1,
+    "dom_nodes": 3168,
+    "running_css_animations": [
+     "eq",
+     "eq",
+     "eq",
+     "eq"
+    ]
+   },
+   "change": {
+    "changes": 6,
+    "frames": 95,
+    "frame_ms": {
+     "median": 116.7,
+     "p95": 183.3,
+     "max": 349.9
+    },
+    "over_20ms": 87,
+    "fps_median": 8.6,
+    "plan_ms": {
+     "freeze": 0.1,
+     "measure": 0.4,
+     "write": 2.8,
+     "clock": 1.6
+    }
+   }
+  },
+  {
+   "when": "2026-11-14T12:29:59.011Z",
+   "machine": {
+    "cpus": 4,
+    "model": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "node": "v22.23.4"
+   },
+   "browser": "Chromium 153.0.8010.12 (Playwright, headless, software rendering)",
+   "payload": {
+    "requests": 48,
+    "total_kb": 1045.7,
+    "hub": {
+     "requests": 45,
+     "kb": 963.2,
+     "largest": [
+      [
+       "tv-setup.html?kiosk=tv&measure&start=f22-alaska",
+       449.7,
+       null
+      ],
+      [
+       "plates/f22-alaska.plate.webp",
+       147.1,
+       null
+      ],
+      [
+       "plates/f22-thunderhead.plate.webp",
+       133.6,
+       null
+      ],
+      [
+       "plates/placeholder-dawn.plate.webp",
+       77.1,
+       null
+      ],
+      [
+       "plates/placeholder-dawn.fgall.webp",
+       74.3,
+       null
+      ],
+      [
+       "plates/f22-alaska.subj.webp",
+       57.8,
+       null
+      ]
+     ]
+    },
+    "google_fonts": {
+     "requests": 3,
+     "kb": 82.5
+    }
+   },
+   "idle": {
+    "seconds": 60,
+    "main_thread_busy_pct": 0.5,
+    "script_ms_per_min": 27.4,
+    "chromium_cpu_pct_all_processes": 59.4,
+    "wakeups_per_min": {
+     "timeout": 5,
+     "interval": 142.9,
+     "animation_frame": 1
+    },
+    "style_recalcs_per_min": 84,
+    "layouts_per_min": 73,
+    "js_heap_used_mb": 2.8,
+    "renderer_pss_mb": 230.3,
+    "dom_nodes": 3168,
+    "running_css_animations": [
+     "eq",
+     "eq",
+     "eq",
+     "eq"
+    ]
+   },
+   "change": {
+    "changes": 6,
+    "frames": 103,
+    "frame_ms": {
+     "median": 100,
+     "p95": 183.3,
+     "max": 250
+    },
+    "over_20ms": 94,
+    "fps_median": 10,
+    "plan_ms": {
+     "freeze": 0,
+     "measure": 0.4,
+     "write": 3.6,
+     "clock": 1.4
+    }
+   }
+  }
+ ]
+}
