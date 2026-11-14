@@ -5,7 +5,7 @@
 //   node tools/readme-media/film-stills.mjs --out <dir>
 import fs from "node:fs";
 import path from "node:path";
-import { startHub, openTv, filmChange } from "./lib.mjs";
+import { startHub, openTv, filmChange, chromium, NOW } from "./lib.mjs";
 
 const arg = (n, d) => { const i = process.argv.indexOf(n); return i > 0 ? process.argv[i + 1] : d; };
 const OUT = path.resolve(arg("--out", "readme-frames/stills")), PORT = +arg("--port", 8796);
@@ -50,6 +50,20 @@ const meta = { rest: {}, dock: [] };
   await page.keyboard.press("ArrowUp");
   for (let t = 40, n = 1; t <= 480; t += 40, n++) { await page.evaluate(t => window.__seek(t), t); await shot(`dock-down-${String(n).padStart(3, "0")}.png`, 40); }
   await page.evaluate(() => { window.__seekMode(false); for (const a of document.getAnimations()) a.play(); });
+  await browser.close();
+}
+// 3. the setup page (no ?kiosk), once its strip and preview have settled
+{
+  const browser = await chromium.launch({ proxy: process.env.HTTPS_PROXY ? { server: process.env.HTTPS_PROXY, bypass: "127.0.0.1,localhost" } : undefined });
+  const ctx = await browser.newContext({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1, timezoneId: "Asia/Singapore" });
+  const page = await ctx.newPage();
+  await page.clock.setFixedTime(new Date(NOW));
+  await page.goto(`http://127.0.0.1:${PORT}/tv-setup.html?start=f22-thunderhead`, { waitUntil: "load" });
+  await page.waitForFunction(() => document.fonts.status === "loaded", null, { timeout: 60e3 });
+  await page.waitForTimeout(6000);
+  await page.mouse.move(5, 5);                        // no hover state anywhere
+  await page.waitForTimeout(800);
+  await page.screenshot({ path: path.join(OUT, "setup.png") });
   await browser.close();
 }
 fs.writeFileSync(path.join(OUT, "stills.json"), JSON.stringify(meta, null, 1));

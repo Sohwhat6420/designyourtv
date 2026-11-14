@@ -6,8 +6,9 @@ Dates are in Singapore time. The project is pre-1.0, so anything may change betw
 
 - **TV: the music card no longer hides the dock's labels.** With the dock up, the card covered most of the focused
   app's name for every app under it; it now sits 14.4cqw up instead of 11.6cqw.
-- **README media, all filmed from the real page:** one lap of the rotation with the page's own change, a 2x depth
-  close-up, a rotating card of every glass widget on the painting it sits on, the dock rising and leaving, and banners
+- **TV: "resets Fri 10:00"**, not "resets in Fri 10:00", on the Claude limits card.
+- **README media, all filmed from the real page:** the two oil paintings in rotation with the page's own change, a 2x
+  depth close-up, the four clocks, a rotating card of every glass widget on the painting it sits on, the dock, and banners
   for the social preview and LinkedIn. `tools/readme-media/` films them with the page's `?measure` hooks and measures
   the "By the numbers" table ([docs/numbers.md](docs/numbers.md)).
 - **`demo.mjs --config <file>`** starts the demo from your own config.

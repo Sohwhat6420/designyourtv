@@ -1,61 +1,37 @@
 <picture>
   <source srcset="assets/tv-loop.webp" type="image/webp">
-  <img src="assets/tv-loop.gif" width="100%" alt="One lap of the TV's rotation, filmed from the demo: two F-22s over snowy mountains, the clock 10:47 standing behind the nearer jet; the painting dissolves to an F-22 against a thunderhead while each digit wipes into its new face and the glass widgets step back and return in the new palette; then a valley at dusk with tall pale digits behind a tree, a valley at dawn, and back to the jets.">
+  <img src="assets/tv-loop.gif" width="100%" alt="The TV's two oil paintings in rotation, filmed from the demo: two F-22s over snowy mountains at dusk, the clock 10:47 standing behind the nearer jet; the painting dissolves to an F-22 climbing past a thunderhead while each digit wipes into its new face and the glass widgets step back and return in the new palette; then back to the jets.">
 </picture>
+
+<sub>The demo's two oil paintings in rotation, in headless Chromium at the TV panel's 1920 × 1080, each change filmed at 25 frames
+a second with the page's own timing hooks. Nothing is mocked up: [how it was filmed](docs/numbers.md#how-the-media-is-made).</sub>
 
 # designyourtv
 
-**A screensaver for Google TV and Android TV.** Hills, clouds and jets pass in front of the digits, the way they do on an iPhone lock screen, and the widgets around it never fake a number.
+**The clock stands behind the painting.** A screensaver for Google TV and Android TV: hills, clouds and jets pass in
+front of the digits, the way they do on an iPhone lock screen, and every widget around it says how old its reading is.
 
-[![test](https://github.com/Sohwhat6420/designyourtv/actions/workflows/test.yml/badge.svg)](https://github.com/Sohwhat6420/designyourtv/actions/workflows/test.yml)
-![licence: MIT](https://img.shields.io/badge/licence-MIT-blue)
-![Google TV and Android TV](https://img.shields.io/badge/Google%20TV-Android%20TV-3DDC84?logo=android&logoColor=white)
-![npm dependencies: 0](https://img.shields.io/badge/npm%20dependencies-0-555)
+[![tests](https://img.shields.io/github/actions/workflow/status/Sohwhat6420/designyourtv/test.yml?branch=main&label=tests&labelColor=1f2328)](https://github.com/Sohwhat6420/designyourtv/actions/workflows/test.yml)
+![licence: MIT](https://img.shields.io/badge/licence-MIT-c9a25e?labelColor=1f2328)
+![Google TV and Android TV](https://img.shields.io/badge/Google%20TV%20%C2%B7%20Android%20TV-c9a25e?logo=android&logoColor=white&labelColor=1f2328)
+![npm dependencies: 0](https://img.shields.io/badge/npm%20dependencies-0-c9a25e?labelColor=1f2328)
 
-<sub>Above: one lap of the demo's rotation, each change the page's own 1.75 s move, filmed frame by frame in headless
-Chromium at the TV panel's 1920 × 1080. Nothing is mocked up: [how it was filmed](docs/numbers.md#how-the-media-is-made).</sub>
-
-- **The clock is a layer of the painting.** Each painting is cut into four layers once, on your own computer, by two
-  small models (BiRefNet and Depth Anything V2), and the digits are drawn between the layers. When a foreground would
-  hide more than 38 % of the digits, depth pauses for that painting.
+- **The clock is a layer of the painting.** Two ONNX models (BiRefNet and Depth Anything V2), run once on your own
+  computer's CPU, split each painting into three cut-outs, and the digits are drawn between the painting and them. When
+  a cut-out would hide more than 38 % of the digits, depth pauses for that painting.
 - **Readings that admit their age.** Calendar, buses, batteries, weather, music and Claude limits. A stale reading greys
   out and says how old it is.
 - **The remote stays in charge.** Any arrow raises a dock of apps; Home brings the painting back. Google TV stays the
   real Home underneath, so casting keeps working.
 
-<img src="assets/depth-closeup.webp" width="100%" alt="Close up, at twice the panel's resolution: solid dark serif digits 10:47 behind the nearer F-22. Its nose and wing pass in front of the 4 and the 7, its tail fin in front of the foot of the 7, and the lower jet's canopy in front of the 1 and the 0.">
-
-<sub>Close up, at 2×: the nearer jet's nose and wing pass in front of the 4 and the 7. This painting uses the
-<i>Tinted</i> clock, which is near solid, so what you see is depth, not see-through digits.</sub>
-
-## By the numbers
-
-| Figure | What it counts |
-| ---: | --- |
-| **164** | tests in CI: 125 for the hub, 31 for tv-guard and a first run against a fake TV, 8 for tv-apply; plus 111 checks of the APK's core logic in every build |
-| **0** | npm dependencies: the hub and every tool use only Node's built-in modules |
-| **0.5&nbsp;%** | of the page's main thread busy at rest, with a song playing: 24 to 27 ms of script a minute |
-| **<&nbsp;3&nbsp;MB** | of JavaScript heap at rest (2.6 and 2.8 MB in two runs) |
-| **~5&nbsp;ms** | of script to plan a painting change; the 1.75 s that follows is transforms and opacity, which the compositor runs |
-| **1.0&nbsp;MB** | for a first load: 963 KB from the hub (the page, the paintings and their cut-outs), 83 KB of fonts |
-| **10** | clock faces, and **4** layers per painting |
-
-<sub>Two runs on 14 Nov 2026 with [`tools/readme-media/measure.mjs`](tools/readme-media/measure.mjs): the demo hub and
-the TV page in headless Chromium on a 4-core cloud machine with no GPU, so these are a browser's costs, not a TV's.
-Method, raw results and what was left out: [docs/numbers.md](docs/numbers.md).</sub>
-
-## Try it in 30 seconds, no TV needed
-
-```bash
-git clone https://github.com/Sohwhat6420/designyourtv && cd designyourtv
-node hub/tools/demo.mjs
-```
-
-Then open <http://127.0.0.1:8790/tv-setup.html?kiosk=tv> and press an arrow key for the dock. Leave out `?kiosk=tv` for
-the setup page. You need Node 22 and nothing else. The demo runs the real hub with sample readings and touches no adb,
-no device and nothing on your machine; the page fetches its fonts from Google Fonts.
-
 ## What it looks like
+
+### The clock behind the subject
+
+<img src="assets/depth-closeup.webp" width="100%" alt="Close up, at twice the panel's resolution: the date, Wed 11 Nov, over solid dark serif digits 10:47 behind the nearer F-22. Its nose and wing pass in front of the 4 and the 7, its tail fin in front of the foot of the 7, and the lower jet's canopy in front of the 1 and the 0.">
+
+<sub>At 2×: the nearer jet's nose and wing pass in front of the 4 and the 7. This painting uses the <i>Tinted</i> clock,
+which is near solid, so what you see is depth, not see-through digits.</sub>
 
 ### Glass widgets
 
@@ -71,15 +47,17 @@ what the TV is playing. The weather is not a card: when the forecast says rain, 
 
 ### Every painting has its own clock
 
+<img src="assets/clocks.webp" width="100%" alt="The same 10:47 on the four paintings: dark Tinted serif digits behind two F-22s over Alaska; Ghost serif digits over a thunderhead with a jet climbing past; tall light digits behind a tree on a valley at dusk; Ghost serif digits behind a tree on a valley at dawn.">
+
 Per painting you pick the clock's face (ten, from condensed to didone), its colour (or *auto*, sampled from the
 painting), the material (ghost, liquid glass, tinted), size, stretch, position, and whether hours stack over minutes.
-Changing painting is one 1.75 s move on the TV: a slow camera push, each digit wiping into the new face as it dips
-behind the subject, the widgets stepping back and returning in the new palette. Bring your own paintings with
+Changing painting takes about 1.8 s on the TV: a 1.75 s camera push, each digit wiping into the new face as it dips
+behind the subject, and the widgets stepping back and returning in the new palette. Bring your own paintings with
 [the plate walkthrough](docs/make-a-plate.md).
 
 ### A dock you drive with the remote
 
-<img src="assets/dock.webp" width="100%" alt="The dock rising over the thunderhead painting: the music card lifts out of the way, the app tiles rise with Netflix focused and named, then the dock slides away again.">
+<img src="assets/dock.webp" width="100%" alt="The dock over the thunderhead painting, with Netflix focused and named above it and the music card lifted out of the way; the dock slides away, the music card settles, then the dock rises again.">
 
 Press any arrow and the dock rises: your apps on the left, the app drawer, the TV's inputs and settings on the right.
 OK opens an app, fast-forward and rewind step through the paintings, and Home brings the painting back. On the
@@ -96,6 +74,61 @@ TV follows as you save. The TV only ever shows the configuration; it never chang
 <sub>Every picture here is the demo in headless Chromium at a TV panel's 1920 × 1080; the widget cards are cropped from
 those frames and only the card being described is lit. App icons are not included (they are the apps' own artwork), so
 the dock shows each app's letter until you add icons: see [Configuration](#configuration).</sub>
+
+## By the numbers
+
+Counted in the repository, or measured in a desktop browser (none of it on a TV):
+
+| Figure | What it counts |
+| ---: | :--- |
+| **164** | tests in CI: 125 for the hub, 31 for tv-guard and a first run against a fake TV, 8 for tv-apply; plus 111 checks of the APK's core logic in every build |
+| **0** | npm dependencies: the hub and every tool use only Node's built-in modules |
+| **0.5&nbsp;%** | of the page's main thread busy at rest, with a song playing: 24 to 27 ms of script a minute |
+| **<&nbsp;3&nbsp;MB** | of JavaScript heap at rest (2.6 and 2.8 MB in two runs) |
+| **~5&nbsp;ms** | of script to plan a painting change; the 1.75 s that follows is transforms and opacity, which the compositor runs |
+| **1.0&nbsp;MB** | for a first load: 963 KB from the hub (the page, the paintings and their cut-outs), 83 KB of fonts |
+
+<sub>Two runs on 14 Nov 2026 with [`tools/readme-media/measure.mjs`](tools/readme-media/measure.mjs): the demo hub and
+the TV page in headless Chromium on a 4-core cloud machine with no GPU. The main thread is the page's own work; drawing
+is not in it, and at rest most of the drawing is the music card's equaliser. Method, raw results and what was left out,
+including that: [docs/numbers.md](docs/numbers.md).</sub>
+
+## Try it without a TV
+
+```bash
+git clone https://github.com/Sohwhat6420/designyourtv && cd designyourtv
+node hub/tools/demo.mjs
+```
+
+Then open <http://127.0.0.1:8790/tv-setup.html?kiosk=tv> and press an arrow key for the dock. Leave out `?kiosk=tv` for
+the setup page. You need Node 22 and nothing else. The demo runs the real hub with sample readings and touches no adb,
+no device and nothing on your machine; the page fetches its fonts from Google Fonts.
+
+## How it works
+
+```mermaid
+%%{init: {"theme": "neutral"}}%%
+flowchart LR
+  setup["Setup page<br/>any browser on the LAN"] -- "saves as you go" --> cfg[("config.json<br/>with history")]
+  subgraph hub["Hub: one always-on computer, port 8790, LAN and loopback only, zero dependencies"]
+    cfg --> srv["hub/server.mjs"]
+    rd["Readers<br/>ICS calendar, buses, weather,<br/>phones over adb, Claude limits"] --> srv
+  end
+  srv -- "server-sent events:<br/>config, readings, music" --> tv["TV: dev.designyourtv<br/>screensaver, Home key service, dock"]
+  srv -- "on and off through tools/tv-guard.mjs<br/>(adb, Wake-on-LAN, Cast)" --> tv
+```
+
+The TV app is a small screensaver that shows the hub's page full screen; an offline copy shows whenever the hub doesn't
+answer. The Claude limits widget runs a tiny headless `claude -p` probe on Haiku at most every 10 minutes (one short
+call each time). The bus widget reads Singapore's LTA DataMall; the other readers work anywhere.
+
+### How the depth works
+
+Each painting is cut once, on your computer's CPU, by two ONNX models: BiRefNet (general, lite) finds the subject and
+Depth Anything V2 Small finds what is nearer than the sky. `tools/depth_pipeline.py` turns them into three cut-outs
+(the ground, the ground with near clouds, the subject alone), and the page draws the clock between the painting and
+the cut-out you pick. Before it does, it measures how much of the digits that cut-out would hide; above 38 % it pauses
+depth for that painting rather than make the time hard to read. [Make your own plate](docs/make-a-plate.md).
 
 ## Put it on your TV
 
@@ -157,7 +190,8 @@ now*. Otherwise it appears when the TV next goes idle.
 Google TV stays the real Home, and a long press of Home still opens its panel.
 
 ```bash
-node tools/tv-apply.mjs --serial <tv-ip>:<port> --tv-ip <tv-ip> --home-key on --apply    # undo: --home-key off --apply
+node tools/tv-apply.mjs --serial <tv-ip>:<port> --tv-ip <tv-ip> --home-key on --apply
+node tools/tv-apply.mjs --serial <tv-ip>:<port> --tv-ip <tv-ip> --home-key off --apply   # undo
 ```
 
 **Undo everything** with the log the run printed:
@@ -205,24 +239,6 @@ It only ever disables (`pm disable-user`), never a full uninstall, never root, n
 isn't a TV, the launcher, the setup wizard Google TV needs for casting, and anything serving an HDMI input or the tuner.
 `--undo devices/tv-undo-<date>.json --apply`, with the same `--serial` and `--tv-ip`, reverses a run.
 </details>
-
-## How it works
-
-```mermaid
-flowchart LR
-  setup["Setup page<br/>any browser on the LAN"] -- "saves as you go" --> cfg[("config.json<br/>with history")]
-  subgraph hub["Hub: one always-on computer, port 8790, LAN and loopback only, zero dependencies"]
-    cfg --> srv["hub/server.mjs"]
-    rd["Readers<br/>ICS calendar, buses, weather,<br/>phones over adb, Claude limits"] --> srv
-  end
-  srv -- "server-sent events:<br/>config, readings, music" --> tv["TV: dev.designyourtv<br/>screensaver, Home key service, dock"]
-  srv -- "on and off through tools/tv-guard.mjs<br/>(adb, Wake-on-LAN, Cast)" --> tv
-```
-
-The TV app is a small screensaver that shows the hub's page full screen; an offline copy shows whenever the hub doesn't
-answer. The Claude limits widget runs a tiny headless `claude -p` probe on Haiku at most every 10 minutes (a negligible
-share of your plan's limits). The bus widget reads Singapore's LTA DataMall; the other readers work
-anywhere.
 
 ### Configuration
 
@@ -275,10 +291,14 @@ Want the same look on a Windows desktop? That is [designyourwindows](https://git
 ## Tests
 
 ```bash
-node --test hub/test/*.test.mjs                      # the hub: config, SSE, net guard, readers, TV power, static files
-node --test tools/test/*.test.mjs                    # tv-guard, and a first run against a fake TV over a fake adb
-node tools/tv-apply.mjs --selftest                   # tv-apply against an in-process fake TV, undo round trips included
-JAVA_HOME=/path/to/jdk-17 node tools/build-tv-apk.mjs --test-only   # the APK's core logic on a plain JVM
+# the hub: config, SSE, net guard, readers, TV power, static files
+node --test hub/test/*.test.mjs
+# tv-guard, and a first run against a fake TV over a fake adb
+node --test tools/test/*.test.mjs
+# tv-apply against an in-process fake TV, undo round trips included
+node tools/tv-apply.mjs --selftest
+# the APK's core logic on a plain JVM
+JAVA_HOME=/path/to/jdk-17 node tools/build-tv-apk.mjs --test-only
 ```
 
 That is 125, 31 and 8 tests in CI, and 111 checks of the core logic in every APK build.
@@ -289,16 +309,23 @@ That is 125, 31 and 8 tests in CI, and 111 checks of the core logic in every APK
   `hub/state/`, keys or logs. API keys and calendar addresses are cut out of every log line and error.
 - `tv-apply.mjs` only makes changes it can undo, logs each one before sending it, works on one explicit serial, and
   refuses anything that isn't a TV, so a phone on the same adb server is never touched.
+- **There is no login.** Anyone on your network can read the hub and change its settings. Its readings (the next
+  calendar event, batteries, bus times, Claude use) are served to any origin, so a web page open in a browser on your
+  network may be able to read them, subject to the browser's own private-network protections; only pages served from
+  your network can write. Run it on a home network you trust.
 - The repository was swept for secrets and personal data before publishing: [docs/security-sweep.md](docs/security-sweep.md).
 
 ## Credits
 
-The two F-22 paintings in `plates/` and the screenshots are oil-paint repaints, made with an image model, of
-public-domain U.S. Air Force photos on Wikimedia Commons:
+The two F-22 paintings in `plates/` are oil-paint repaints, made with an image model, of public-domain U.S. Air Force
+photos on Wikimedia Commons:
 [F-22 Raptors over Alaska](https://commons.wikimedia.org/wiki/File:F-22_Raptor_pair_over_Alaska_-_081010-F-1234X-924.jpg)
 and [F-22 Raptor flying at twilight](https://commons.wikimedia.org/wiki/File:F-22_Raptor_flying_at_twilight_190728-F-VA182-1014.jpg)
 (U.S. Air Force photo by 2nd Lt. Samuel Eckholm). No endorsement by the U.S. Air Force is implied. The demo's music
-card names Debussy's *Clair de lune*, a public-domain work, as sample data.
+card names Debussy's *Clair de lune*, a public-domain work, as sample data. The two valley paintings are drawn by
+`tools/make-placeholder.py`. The paintings are the only generated images: every screen in this README is a capture of
+the real page ([how it was made](docs/numbers.md#how-the-media-is-made)). The README's cards and banners are set in
+Hanken Grotesk, Instrument Serif and JetBrains Mono (SIL OFL 1.1, in `tools/readme-media/fonts/`).
 
 ## Licence
 

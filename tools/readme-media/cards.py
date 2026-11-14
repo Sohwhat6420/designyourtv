@@ -11,7 +11,7 @@ panel, the sheen sweep and the rim pulse are the profile's repo cards' (koilib.g
 import base64, json, os, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from svglib import Doc, f, font, esc, write_svg  # noqa: E402
+from svglib import Doc, f, font  # noqa: E402
 
 SLIDES = [  # (card, title, what it shows: from tv-setup.html and the hub's readers)
     ("calendar", "Calendar", "The month at a glance, with today ringed in the painting's own accent."),
@@ -29,17 +29,17 @@ THEMES = {  # the profile's (koilib.THEMES): type, accents and ghost glass
     "dark": dict(text="#f4f3ef", dim="#b8bcc4", faint="#8f949c", gold="#d9b77a", accent="#ffb340",
                  gBase="rgba(28,32,39,.56)", gHiA="rgba(255,255,255,.07)", gHiB="rgba(255,255,255,.01)",
                  gGlow="#ffffff", gGlowOp=0.035, gGrain="#ffffff", gGrainOp=0.05, gRing="#ffffff", gRingOp=0.15,
-                 gSheen="#ffffff", gSheenOp=0.42, gShadow="#000000", gShadowOp=0.52, track="rgba(255,255,255,.14)"),
+                 gSheen="#ffffff", gSheenOp=0.42, gShadow="#000000", gShadowOp=0.52, track="rgba(255,255,255,.14)", win="#0b0d10"),
     "light": dict(text="#14161a", dim="#4c5058", faint="#5d636c", gold="#7a5612", accent="#9a4f00",
-                  gBase="rgba(243,242,238,.62)", gHiA="rgba(255,255,255,.18)", gHiB="rgba(232,234,238,.24)",
-                  gGlow="#ffffff", gGlowOp=0.6, gGrain="#14161a", gGrainOp=0.03, gRing="#14161a", gRingOp=0.11,
-                  gSheen="#ffffff", gSheenOp=0.88, gShadow="#0a1428", gShadowOp=0.22, track="rgba(20,22,26,.12)"),
+                  gBase="#f5f1e8", gHiA="rgba(255,255,255,.5)", gHiB="rgba(240,232,216,.35)",
+                  gGlow="#ffffff", gGlowOp=0.6, gGrain="#3c280a", gGrainOp=0.012, gRing="#3c280a", gRingOp=0.10,
+                  gSheen="#ffffff", gSheenOp=0.88, gShadow="#0a1428", gShadowOp=0.22, track="rgba(20,22,26,.12)", win="#1a1714"),
 }
-PAD = (16, 6, 16, 26)                       # room round the glass for its shadow (koilib.GLASS_PAD)
 W, H = 1200, 513
 SX, SY, SW, SH = 24, 24, 744, 465           # the slide window, 16:10
-STEP = 4.2                                  # each slide's turn, s
-T = dict(fade=1.05, settle=1.5, push=1.75, out=0.26, inAt=0.85, inn=0.65)   # the TV's timings (tv-setup.html T, ON_TV)
+STEP = 5.5                                  # each slide's turn, s
+LEAD = 2.4                                  # every animation starts this far in: the first paint is the Calendar, mid-hold
+T = dict(settle=1.5, out=0.35, gap=0.1, inn=0.5, capOut=0.3, capIn=0.4)   # a dip, not a cross-fade: two crops never overlap
 EASE = dict(dolly="cubic-bezier(.45,.05,.25,1)", settle="cubic-bezier(.22,1,.36,1)")
 
 
@@ -116,88 +116,67 @@ def build(theme, slides_dir):
     meta = json.load(open(os.path.join(slides_dir, "slides.json")))
     n, cyc = len(SLIDES), len(SLIDES) * STEP
     pc = lambda t: "%s%%" % f(max(0.0, min(cyc, t)) / cyc * 100, 3)
+    run = lambda name, dur, ease="linear": "animation:%s %ss %s -%ss infinite" % (name, f(dur, 2), ease, f(LEAD, 2))
     desc = ("The TV's glass widgets, one at a time, each shown on the painting it sits on, in real frames from the demo: "
             + " ".join("%s: %s" % (t, d) for _, t, d in SLIDES))
     doc = Doc(W, H, "designyourtv's glass widgets", desc)
     css = doc.css
-    # slides
+    doc.defs.append('<filter id="bl" x="-5%%" y="-5%%" width="110%%" height="110%%"><feGaussianBlur stdDeviation="3.5"/></filter>')
     imgs, caps = [], []
     for i, (card, title, text) in enumerate(SLIDES):
         m = meta[card]
         data = base64.b64encode(open(os.path.join(slides_dir, card + ".jpg"), "rb").read()).decode()
-        cx, cy, cw, ch, cr = m["card"]
         k = SW / 1120.0
-        cx, cy, cw, ch, cr = cx * k, cy * k, cw * k, ch * k, cr * k
-        hole = '<rect x="%s" y="%s" width="%s" height="%s" rx="%s"/>' % (f(SX + cx - 1, 1), f(SY + cy - 1, 1), f(cw + 2, 1), f(ch + 2, 1), f(cr + 1, 1))
-        doc.defs.append('<mask id="h%d"><rect x="%d" y="%d" width="%d" height="%d" fill="#fff"/>%s</mask>'
-                        % (i, SX, SY, SW, SH, hole.replace("/>", ' fill="#000"/>')))
-        imgs.append('<g class="s s%d"><g class="d d%d"><image href="data:image/jpeg;base64,%s" x="%d" y="%d" width="%d" height="%d" preserveAspectRatio="xMidYMid slice"/>'
-                    '<rect x="%d" y="%d" width="%d" height="%d" fill="#05070a" fill-opacity=".5" mask="url(#h%d)"/>'
-                    '%s</g></g>'
-                    % (i, i, data, SX, SY, SW, SH, SX, SY, SW, SH, i,
-                       hole.replace("/>", ' fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="1.2"/>')))
-        # its caption
-        # the counter, title and text, centred between the eyebrow and the painting's name
-        lines = wrap(text, "h4", 18.5, 360)
-        block = 104 + (len(lines) - 1) * 28
-        x0, y = 806, 66 + (420 - 66 - block) / 2 - 6
-        parts = []
-        parts.append(doc.text("%02d / %02d" % (i + 1, n), x0, y, "h6", 12.5, Th["gold"], tracking=0.12)[0])
-        parts.append(doc.text(title, x0 - 2, y + 58, "serif", 52, Th["text"])[0])
-        for j, line in enumerate(lines):
-            parts.append(doc.text(line, x0, y + 104 + j * 28, "h4", 18.5, Th["dim"])[0])
-        parts.append(doc.text("ON " + PLATES[m["plate"]].upper(), x0, 420, "h6", 11.5, Th["faint"], tracking=0.12)[0])
+        cx, cy, cw, ch, cr = (v * k for v in m["card"])
+        hole = 'x="%s" y="%s" width="%s" height="%s" rx="%s"' % (f(SX + cx - 1, 1), f(SY + cy - 1, 1), f(cw + 2, 1), f(ch + 2, 1), f(cr + 1, 1))
+        doc.defs.append('<image id="im%d" href="data:image/jpeg;base64,%s" x="%d" y="%d" width="%d" height="%d" preserveAspectRatio="xMidYMid slice"/>'
+                        % (i, data, SX, SY, SW, SH))
+        doc.defs.append('<mask id="h%d"><rect x="%d" y="%d" width="%d" height="%d" fill="#fff"/><rect %s fill="#000"/></mask>' % (i, SX, SY, SW, SH, hole))
+        # the frame as drawn; outside the card, the same frame softened and veiled, so the card is what you read
+        imgs.append('<g class="s s%d"><g class="d d%d"><use href="#im%d"/><g mask="url(#h%d)"><use href="#im%d" filter="url(#bl)"/>'
+                    '<rect x="%d" y="%d" width="%d" height="%d" fill="#05070a" fill-opacity=".58"/></g>'
+                    '<rect %s fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="1.2"/></g></g>'
+                    % (i, i, i, i, i, SX, SY, SW, SH, hole))
+        # its caption: the title on a fixed baseline, the text under it, the painting at the foot
+        x0, parts = 806, []
+        parts.append(doc.text(title, x0 - 2, 150, "serif", 60, Th["text"])[0])
+        for j, line in enumerate(wrap(text, "h4", 22, 362)):
+            parts.append(doc.text(line, x0, 200 + j * 32, "h4", 22, Th["dim"])[0])
+        parts.append(doc.text("Painting: " + PLATES[m["plate"]], x0, 452, "h5", 15, Th["faint"])[0])
         caps.append('<g class="c c%d">%s</g>' % (i, "".join(parts)))
-    # the fixed eyebrow, and the progress track under the captions
-    eyebrow = doc.text("GLASS WIDGETS · REAL TV FRAMES", 806, 66, "h6", 12.5, Th["gold"], tracking=0.12)[0]
-    bw, gap, by = 38, 6, 452
+    eyebrow = doc.text("GLASS WIDGETS \u00b7 REAL TV FRAMES", 806, 41, "h6", 15, Th["gold"], tracking=0.12)[0]
+    bw, gap, by = 40, 6, 482
     track = "".join('<rect x="%s" y="%d" width="%d" height="3" rx="1.5" fill="%s"/>' % (f(806 + k * (bw + gap)), by, bw, Th["track"]) for k in range(n))
     bars = "".join('<rect class="p p%d" x="%s" y="%d" width="%d" height="3" rx="1.5" fill="%s"/>' % (k, f(806 + k * (bw + gap)), by, bw, Th["accent"]) for k in range(n))
 
-    # ---- motion (hero.py's scheme): slide i arrives at i*STEP; the last one leaves at the wrap, over slide 0
-    css.append(".s{opacity:0}.s0{opacity:1}.c{opacity:0}.c0{opacity:1}.p{opacity:0}.p0{opacity:1}")
+    # ---- motion: slide i holds from i*STEP to (i+1)*STEP; between two slides a dip (out, a breath of window, in)
+    css.append(".s,.c,.p{opacity:0}.s0,.c0,.p0{opacity:1}")
     css.append(".d{transform-box:view-box;transform-origin:%spx %spx}" % (f(SX + SW / 2), f(SY + SH / 2)))
     for i in range(n):
-        a = i * STEP
-        b = (i + 1) * STEP if i < n - 1 else cyc          # when the next one starts to cover it
-        if i > 0 and i < n - 1:
-            css.append("@keyframes o%d{0%%,%s{opacity:0}%s,%s{opacity:1}%s,100%%{opacity:0}}" % (i, pc(a), pc(a + T["fade"]), pc(b + T["fade"]), pc(b + T["fade"] + .01)))
-        elif i == n - 1:
-            css.append("@keyframes o%d{0%%{opacity:1}%s{opacity:0}%s{opacity:0}%s,100%%{opacity:1}}" % (i, pc(T["fade"]), pc(a), pc(a + T["fade"])))
-        if i > 0:
-            css.append(".s%d{animation:o%d %ss infinite;animation-timing-function:%s}" % (i, i, f(cyc), EASE["dolly"]))
-        # the camera: in at a, settling from 1.04; pushed at b while the next dissolves over it
-        if i == 0:
-            kf = "0%%{transform:scale(1.04)}%s{transform:none}%s{transform:none}%s,100%%{transform:translate(-.3%%,-.5%%) scale(1.04)}" % (pc(T["settle"]), pc(b), pc(b + T["push"]))
-        elif i < n - 1:
-            kf = "0%%,%s{transform:scale(1.04)}%s{transform:none}%s{transform:none}%s,100%%{transform:translate(-.3%%,-.5%%) scale(1.04)}" % (pc(a), pc(a + T["settle"]), pc(b), pc(b + T["push"]))
-        else:   # pushed at the wrap (0), back to 1.04 unseen, then in at a
-            kf = "0%%{transform:none}%s{transform:translate(-.3%%,-.5%%) scale(1.04)}%s{transform:scale(1.04)}%s{transform:scale(1.04)}%s,100%%{transform:none}" % (pc(T["push"]), pc(T["push"] + .01), pc(a), pc(a + T["settle"]))
-        css.append("@keyframes z%d{%s}.d%d{animation:z%d %ss infinite;animation-timing-function:%s}" % (i, kf, i, i, f(cyc), EASE["settle"]))
-        # the caption: out quickly at the change, in late (the TV's date line: 260 ms out, in from 850 ms over 650 ms)
-        inn = (pc(a + T["inAt"]), pc(a + T["inAt"] + T["inn"]))
-        if i == 0:
-            cap = "0%%,%s{opacity:0}%s{opacity:1}%s{opacity:1}%s,100%%{opacity:0}" % (inn[0], inn[1], pc(b), pc(b + T["out"]))
-        else:
-            cap = "0%%,%s{opacity:0}%s{opacity:1}%s{opacity:1}%s,100%%{opacity:0}" % (inn[0], inn[1], pc(b), pc(min(cyc, b + T["out"])))
-        css.append("@keyframes t%d{%s}.c%d{animation:t%d %ss linear infinite}" % (i, cap, i, i, f(cyc)))
-        css.append("@keyframes q%d{0%%,%s{opacity:0}%s,%s{opacity:1}%s,100%%{opacity:0}}.p%d{animation:q%d %ss linear infinite}"
-                   % (i, pc(a), pc(a + .3), pc(b), pc(min(cyc, b + .3)), i, i, f(cyc)))
-    # the profile repo cards' sheen and rim (rc*s, rc*c)
-    css.append(".sw{animation:sw 7s ease-in-out infinite}@keyframes sw{0%,35%{transform:translateX(-120%)}65%,100%{transform:translateX(120%)}}")
-    css.append(".rim{animation:rim 4.5s ease-in-out infinite}@keyframes rim{0%,100%{stroke-opacity:.35}18%{stroke-opacity:1}}")
+        a, b = i * STEP, (i + 1) * STEP
+        inA, inB, outA = a + T["gap"], a + T["gap"] + T["inn"], b - T["out"]
+        css.append("@keyframes o%d{0%%,%s{opacity:0}%s,%s{opacity:1}%s,100%%{opacity:0}}" % (i, pc(inA), pc(inB), pc(outA), pc(b)))
+        css.append(".s%d{%s}" % (i, run("o%d" % i, cyc, "ease-in-out")))
+        # the camera, the TV's: settling in from 1.04, and a slow push before it leaves
+        css.append("@keyframes z%d{0%%,%s{transform:scale(1.04)}%s{transform:none}%s{transform:none}%s,100%%{transform:translate(-.3%%,-.5%%) scale(1.02)}}"
+                   % (i, pc(inA), pc(inA + T["settle"]), pc(b - 1.6), pc(b)))
+        css.append(".d%d{%s}" % (i, run("z%d" % i, cyc, EASE["settle"])))
+        css.append("@keyframes t%d{0%%,%s{opacity:0}%s,%s{opacity:1}%s,100%%{opacity:0}}" % (i, pc(inA), pc(inA + T["capIn"]), pc(b - T["capOut"]), pc(b)))
+        css.append(".c%d{%s}" % (i, run("t%d" % i, cyc)))
+        css.append("@keyframes q%d{0%%,%s{opacity:0}%s,%s{opacity:1}%s,100%%{opacity:0}}" % (i, pc(a), pc(a + .3), pc(b - .3), pc(b)))
+        css.append(".p%d{%s}" % (i, run("q%d" % i, cyc)))
+    # the profile repo cards' sheen (rc*s): here one pass per slide, in step with it
+    css.append("@keyframes sw{0%%,22%%{transform:translateX(-120%%)}50%%,100%%{transform:translateX(120%%)}}.sw{%s}" % run("sw", STEP, "ease-in-out"))
     css.append("@media (prefers-reduced-motion: reduce){*{animation:none!important}}")
     doc.defs.append('<clipPath id="win"><rect x="%d" y="%d" width="%d" height="%d" rx="12"/></clipPath>' % (SX, SY, SW, SH))
     doc.defs.append('<linearGradient id="swg" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/>'
-                    '<stop offset=".5" stop-color="#fff" stop-opacity=".09"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>')
-    body = [glass(doc, Th, 1, 1, W - 2, H - 2, 18),
-            '<g clip-path="url(#win)">%s<rect class="sw" x="%d" y="%d" width="%d" height="%d" fill="url(#swg)"/></g>' % ("".join(imgs), SX, SY, SW, SH),
-            '<rect class="rim" x="%s" y="%s" width="%d" height="%d" rx="12" fill="none" stroke="%s" stroke-width="1"/>' % (f(SX + .5), f(SY + .5), SW - 1, SH - 1, Th["gold"]),
-            eyebrow, "".join(caps), track, bars]
-    doc.body.append('<g transform="translate(%d %d)">%s</g>' % (PAD[0], PAD[1], "".join(body)))
-    svg = doc.render()
-    vw, vh = W + PAD[0] + PAD[2], H + PAD[1] + PAD[3]
-    return svg.replace('width="%d" height="%d" viewBox="0 0 %d %d"' % (W, H, W, H), 'width="%d" height="%d" viewBox="0 0 %d %d"' % (vw, vh, vw, vh), 1)
+                    '<stop offset=".5" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>')
+    doc.body += [glass(doc, Th, 1, 1, W - 2, H - 2, 18, shadow=False),
+                 '<g clip-path="url(#win)"><rect x="%d" y="%d" width="%d" height="%d" fill="%s"/>%s<rect class="sw" x="%d" y="%d" width="%d" height="%d" fill="url(#swg)"/></g>'
+                 % (SX, SY, SW, SH, Th["win"], "".join(imgs), SX, SY, SW, SH),
+                 '<rect x="%s" y="%s" width="%d" height="%d" rx="12" fill="none" stroke="%s" stroke-opacity=".35" stroke-width="1"/>' % (f(SX + .5), f(SY + .5), SW - 1, SH - 1, Th["gold"]),
+                 eyebrow, "".join(caps), track, bars]
+    return doc.render()
 
 
 if __name__ == "__main__":

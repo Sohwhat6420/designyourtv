@@ -57,21 +57,24 @@ mocked up or generated. The scripts are in [`tools/readme-media/`](../tools/read
 
 | File | Made by | How |
 | --- | --- | --- |
-| `assets/tv-loop.webp`, `.gif` | `film-loop.mjs`, `encode.py` | One unfilmed lap of the four paintings, then a filmed lap: each change stepped through at 25 frames a second with the page's own `?measure` hooks (`__swapAt`, `__seek`), so every frame is where the real change stands at that moment. WebP 1600 × 900 (5.5 MB); GIF 800 × 450 at 12.5 frames a second (7.4 MB). |
-| `assets/depth-closeup.webp` | `film-stills.mjs`, `crop.py` | Raptors over Alaska at 2x (3840 × 2160), cropped. |
-| `assets/widgets-*.svg` | `film-stills.mjs`, `crop.py`, `cards.py` | Each card in a 16:10 crop of a 2x frame; the other cards are dimmed, never removed or redrawn. The rotation is the profile README's: CSS only. |
-| `assets/dock.webp` | `film-stills.mjs`, `crop.py` | The first arrow press raises the dock and Up sends it away, both stepped through at 25 frames a second. |
+| `assets/tv-loop.webp`, `.gif` | `film-loop.mjs`, `encode.py` | The two F-22 paintings in rotation (`config.loop.json`): one unfilmed lap, then a filmed lap, each change stepped through at 25 frames a second with the page's own `?measure` hooks (`__swapAt`, `__seek`), so every frame is where the real change stands at that moment. WebP at 1920 × 1080 (LOOPWEBP); GIF at 960 × 540 and 12.5 frames a second (LOOPGIF). |
+| `assets/depth-closeup.webp` | `film-stills.mjs`, `crop.py` | Raptors over Alaska at 2x (3840 × 2160), cropped between the two columns of cards. |
+| `assets/clocks.webp` | `film-stills.mjs`, `crop.py` | The same crop from each of the four paintings at 2x, scaled to half and set 2 × 2. |
+| `assets/widgets-*.svg` | `film-stills.mjs`, `crop.py`, `cards.py` | Each card in a 16:10 crop of a 2x frame. Around the card the same frame is softened and darkened, never removed or redrawn. The rotation is CSS only, on the profile README's scheme. |
+| `assets/dock.webp` | `film-stills.mjs`, `crop.py` | Up sends the dock away and the first arrow press raises it again, both stepped through at 25 frames a second; the top edge is darkened a little where the crop cuts the digits and a card. |
+| `docs/screens/setup.webp` | `film-stills.mjs`, `crop.py` | The setup page after 6 s, its empty side margins trimmed. |
 | `assets/banner-*.png` | `banner.mjs` | A 2x frame of Raptors over Alaska, scaled, beside the title. |
 
 The page's clock is pinned to Wednesday 11 November 2026, 10:47 in Singapore, and the demo hub's clock starts at the
 same moment (`fake-now.mjs`), so the sample readings agree with it. The F-22 paintings use their per-painting settings
-in `config.capture.json`; Raptors over Alaska uses the *Tinted* clock.
+in `config.capture.json`; Raptors over Alaska uses the *Tinted* clock. The demo has no Claude Code activity, so that
+card shows the page's own labelled sample, as it does on a TV until the hub has data.
 
 ```bash
 node tools/readme-media/film-loop.mjs --out frames/loop
-python tools/readme-media/encode.py frames/loop assets/tv-loop --width 1600 --gif-width 800
+python tools/readme-media/encode.py frames/loop assets/tv-loop --width 1920 --gif-width 960 --quality 74
 node tools/readme-media/film-stills.mjs --out frames/stills
-python tools/readme-media/crop.py frames/stills frames/slides
+python tools/readme-media/crop.py frames/stills frames/slides    # also writes docs/screens/setup.webp
 python tools/readme-media/cards.py frames/slides
 node tools/readme-media/banner.mjs frames/stills
 ```
