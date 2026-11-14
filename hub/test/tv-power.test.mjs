@@ -161,14 +161,16 @@ test("keeper: a TV whose adb stays silent is not reconnected on every check (7 N
   const f = fakeTv({ up: false, connectBrings: false });
   let casts = 0;
   const clock = fakeClock();
-  const k = createTvKeeper({ run: f.run, cast: { ...noCast, status: async () => { casts++; return { standby: true, active_input: false, apps: [] }; } }, ...clock });
+  // rng 0: every backoff draws its shortest wait (half the window), the worst case. With Math.random the count ran from
+  // 7 to 11, so a bound of 8 failed now and then (14 Nov)
+  const k = createTvKeeper({ run: f.run, cast: { ...noCast, status: async () => { casts++; return { standby: true, active_input: false, apps: [] }; } }, ...clock, rng: () => 0 });
   const connects = () => f.calls.filter(c => c === `connect ${TV.serial}`).length;
   await k.check();
   assert.equal(connects(), 1, "the first failed check reconnects once");
-  // 60 checks, one a minute, for the next hour: the backoff (60 s doubling to 15 min) allows only a handful of reconnects
+  // 60 checks, one a minute, for the next hour: the backoff (60 s doubling to 15 min) allows at most 11 reconnects
   for (let i = 0; i < 60; i++) { await clock.sleep(60e3); await k.check(); }
-  assert.ok(connects() <= 8, `reconnects in an hour: ${connects()}`);
-  assert.ok(casts <= 8, `cast probes in an hour: ${casts}`);
+  assert.ok(connects() <= 11, `reconnects in an hour: ${connects()}`);
+  assert.ok(casts <= 11, `cast probes in an hour: ${casts}`);
   assert.ok(f.calls.every(c => !c.startsWith("disconnect")), "never disconnects a TV that is not listed offline");
   // when it comes back the gate opens at once and the next outage reconnects straight away
   f.up = true;
