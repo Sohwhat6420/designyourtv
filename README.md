@@ -240,7 +240,7 @@ Every painting keeps its own clock. Per painting you pick the face (ten, from co
 *auto*, sampled from the painting), the material (ghost, liquid glass, tinted), size, stretch, position, and whether
 hours stack over minutes. Bring your own paintings with [the plate walkthrough](docs/make-a-plate.md).
 
-![The setup page: the preview with the dock up, the painting's settings beside it](docs/screens/setup.webp)
+![The setup page: the preview with the dock up, the painting's settings beside it](assets/premium/setup.jpg)
 
 The setup page, open in any browser on your network, is where you decide what the TV shows. It saves as you go and the
 TV follows as you save. The TV only ever shows the configuration; it never changes it.

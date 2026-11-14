@@ -137,6 +137,7 @@ script with your own painting and icons, but not reproduce these exact frames fr
 | `night.jpg` | Night on OK. |
 | `depth-closeup.jpg` | A crop of the clock and the painting's subject from a 2x frame. |
 | `card-*.png` | Each card cut from a 2x frame, with the painting behind its glass exactly as drawn. |
+| `setup.jpg` | The setup page on the same painting after 5 s, its empty side margins and the thumbnail strip trimmed. |
 
 ### The drawn panels (`assets/premium/*-dark.svg`, `*-light.svg`)
 
