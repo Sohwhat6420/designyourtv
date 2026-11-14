@@ -8,6 +8,7 @@
 //   <private>/activity.json                                             optional: { replies, tokens, total } per day
 // Bus stops and service numbers are made up. Nothing is written anywhere but --out; every request but GET is refused.
 //   node tools/readme-media/film-premium.mjs --private <dir> --out <dir> [--port 8797] [--only hero,loop,dock,aod,night,setup]
+//        [--start <plate id>]   another painting to film (one of the repository's own, for instance)
 import fs from "node:fs";
 import path from "node:path";
 import { startHub, chromium, NOW, HERE } from "./lib.mjs";
@@ -16,6 +17,7 @@ const arg = (n, d) => { const i = process.argv.indexOf(n); return i > 0 ? proces
 const OUT = path.resolve(arg("--out", "readme-frames/premium")), PORT = +arg("--port", 8797);
 const PRIV = path.resolve(arg("--private", "private"));
 const ONLY = (arg("--only", "hero,loop,dock,aod,night,setup")).split(",");
+const START = arg("--start", "plane-concorde-climb");
 fs.mkdirSync(OUT, { recursive: true });
 
 const PLATE = `{id:"plane-concorde-climb", name:"Concorde climbing out, rain", mine:false, ink:"#cfdaf5", mode:"light", face:"tall", sugg:{size:22}},`;
@@ -37,7 +39,7 @@ try {
 const MIME = { ".webp": "image/webp", ".png": "image/png" };
 const file = (r, p) => fs.existsSync(p) ? r.fulfill({ status: 200, contentType: MIME[path.extname(p)] || "application/octet-stream", body: fs.readFileSync(p) }) : r.fulfill({ status: 404, body: "" });
 
-async function open({ query = "", scale = 1, kiosk = true, start = "plane-concorde-climb" } = {}) {
+async function open({ query = "", scale = 1, kiosk = true, start = START } = {}) {
   const proxy = process.env.HTTPS_PROXY ? { server: process.env.HTTPS_PROXY, bypass: "127.0.0.1,localhost" } : undefined;
   const browser = await chromium.launch({ proxy, executablePath: process.env.TV_CHROMIUM || undefined });   // TV_CHROMIUM: a headless shell to use instead of Playwright's default
   const ctx = await browser.newContext({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: scale, timezoneId: "Asia/Singapore", reducedMotion: "no-preference" });
@@ -125,7 +127,8 @@ try {
     await page.waitForTimeout(3500);
     await page.screenshot({ path: path.join(OUT, "aod-steady.png") });
     meta.aod = await page.evaluate(() => ({ cls: document.querySelector("#stage").className, anims: document.getAnimations().filter(a => !(a instanceof CSSTransition) && a.playState === "running").length,
-      time: document.querySelector("#ambTime").textContent, date: document.querySelector("#ambDate").textContent }));
+      time: document.querySelector("#ambTime").textContent, date: document.querySelector("#ambDate").textContent,
+      depth: !document.querySelector("#stage").classList.contains("amb-flat"), cover: typeof amb === "object" && amb.cover != null ? Math.round(amb.cover * 100) / 100 : null }));
     await t.hold(2400);
     await t.key("ArrowDown"); await t.frames(16);
     await browser.close();

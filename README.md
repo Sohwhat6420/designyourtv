@@ -100,6 +100,10 @@ motion in between, the kind of guard television makers build in against burn-in.
 3 hours idle and with nothing playing, the panel itself goes dark. Any key wakes it, and that key does nothing else,
 so a press in the dark never opens something by accident. It comes back faster (1.1 s) than it went (2.6 s).
 
+Where a painting's subject crosses that clock, the subject still passes in front of the digits, as it does on the home
+screen, and the date stays above it. In the picture above the clock sits clear of the aircraft, so there is nothing to
+pass. This part was added on 14 Nov 2026 and checked in a desktop browser, not yet on the television.
+
 What this saves in watts was never measured (there was no meter on the plug), and neither was the effect on burn-in,
 so this page gives the backlight levels and the mechanisms and stops there.
 
