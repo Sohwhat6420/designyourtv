@@ -36,3 +36,6 @@ __pycache__/
 *.log
 .DS_Store
 Thumbs.db
+
+# README previews (tools/readme-media, rendered locally to compare before publishing)
+.preview/

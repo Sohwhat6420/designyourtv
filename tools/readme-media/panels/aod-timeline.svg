@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 484" width="1200" height="484" role="img" aria-labelledby="t d">
+<title id="t">An idle evening: the backlight, from the last key press to a dark panel</title>
+<desc id="d">A step chart of the panel's backlight, out of 100, against time since the last key press (not to scale). Another app runs at your own level. Home brings the painting to the front and the backlight eases to 35. After 30 minutes without a key, or 2 minutes between 23:00 and 07:00, a veil comes down over 2.6 seconds, the widgets and the dock go, one dim clock stays and the backlight drops to 1. The clock steps to a new spot every 4 minutes along a path 44 pixels wide and 28 tall. Between midnight and 07:00, after 3 hours idle with nothing playing, the panel goes dark. Any key wakes it in 1.1 seconds and does nothing else. Timings are from the page's code.</desc>
+<style>
+/*@FONTS*/
+/*@TOKENS*/svg{--ink:#E6EDF3;--ink2:#9198A1;--rule:#30363D;--mark:#7D8590;--acc:#EBA24A;--accink:#10141F}/*@END*/
+/*@AOD_STEPS*/
+text{font-family:"HG","Hanken Grotesk",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;fill:var(--ink)}
+.h{font-size:19px;fill:var(--ink2)}
+.n{font-size:21px;font-weight:600}
+.e{font-size:19px;font-weight:600}
+.s{font-size:17px;fill:var(--ink2)}
+.a{font-size:15px;fill:var(--ink2)}
+.grid{stroke:var(--rule);stroke-width:1}
+.drop{stroke:var(--rule);stroke-width:1}
+.lit{stroke:var(--acc);stroke-width:3.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.own{stroke:var(--mark);stroke-width:3.5;fill:none;stroke-linecap:round}
+.dark{stroke:var(--mark);stroke-width:2;fill:none;stroke-linecap:round;stroke-dasharray:1 7}
+.tick{stroke:var(--acc);stroke-width:3.5;stroke-linecap:round}
+.frame{fill:none;stroke:var(--rule);stroke-width:1}
+.pl{fill:none;stroke:var(--mark);stroke-width:1;opacity:.45}
+.pd{fill:var(--mark);opacity:.8}
+/* the evening passes along the line; under reduced motion the diagram stands complete without it */
+.now{fill:var(--acc);animation:now 18s linear infinite}
+@keyframes now{0%{transform:translate(40px,96px);opacity:0}4%{transform:translate(40px,96px);opacity:1}14%{transform:translate(200px,96px)}23.7%{transform:translate(200px,252px)}42.4%{transform:translate(500px,252px)}47.5%{transform:translate(500px,334px)}66.2%{transform:translate(800px,334px)}79.4%{transform:translate(1010px,336px)}84.6%{transform:translate(1010px,252px)}94%{transform:translate(1160px,252px);opacity:1}98%,100%{transform:translate(1160px,252px);opacity:0}}
+/* the clock's own behaviour: it jumps to the next point and holds, with nothing in between */
+.st{fill:var(--acc);transform:translate(0px,40.1px);animation:aodstep 27.6s step-end infinite}
+@media (prefers-reduced-motion:reduce){.now{display:none}.st{animation:none}}
+</style>
+<defs>
+<clipPath id="c1"><rect x="286" y="126" width="200" height="112.5" rx="8"/></clipPath>
+<clipPath id="c2"><rect x="600" y="206" width="190" height="106.9" rx="8"/></clipPath>
+</defs>
+<text class="h" x="0" y="24">An idle evening: the backlight, from the last key press to a dark panel</text>
+
+<path class="grid" d="M40 96.5H1160M40 336.5H1160"/>
+<text class="a" x="1168" y="101">100</text><text class="a" x="1168" y="341">0</text>
+
+<path class="drop" d="M200.5 256V354M500.5 338V354M800.5 338V354M1010.5 338V354"/>
+
+<path class="own" d="M40 96H200"/>
+<path class="lit" d="M200 96V252H500V334H800"/>
+<path class="dark" d="M804 336H1006"/>
+<path class="lit" d="M1010 336V252H1160"/>
+<path class="tick" d="M545 325V334M590 325V334M635 325V334M680 325V334M725 325V334M770 325V334"/>
+
+<image href="@IMG(hero.jpg,400,80)" x="286" y="126" width="200" height="112.5" clip-path="url(#c1)" preserveAspectRatio="xMidYMid slice"/>
+<rect class="frame" x="286" y="126" width="200" height="112.5" rx="8"/>
+<image href="@IMG(aod.jpg,380,82)" x="600" y="206" width="190" height="106.9" clip-path="url(#c2)" preserveAspectRatio="xMidYMid slice"/>
+<rect class="frame" x="600" y="206" width="190" height="106.9" rx="8"/>
+
+<text class="s" x="40" y="124">Another app,</text>
+<text class="s" x="40" y="146">at your own level</text>
+<text class="n" x="214" y="286">35 of 100</text>
+<text class="n" x="514" y="316">1 of 100</text>
+<text class="n" x="814" y="316">0: panel dark</text>
+<text class="n" x="1024" y="286">35 of 100</text>
+
+<text class="e" x="200" y="380">Home</text>
+<text class="s" x="200" y="404">The painting comes to the front,</text>
+<text class="s" x="200" y="426">and the backlight eases to 35.</text>
+
+<text class="e" x="500" y="380">30 min without a key</text>
+<text class="s" x="500" y="404">2 min between 23:00 and 07:00.</text>
+<text class="s" x="500" y="426">A veil comes down over 2.6 s.</text>
+<text class="s" x="500" y="448">Only a dim clock stays, and it</text>
+<text class="s" x="500" y="470">steps to a new spot every 4 min.</text>
+
+<text class="e" x="800" y="380">Midnight to 07:00</text>
+<text class="s" x="800" y="404">After 3 h idle, with</text>
+<text class="s" x="800" y="426">nothing playing,</text>
+<text class="s" x="800" y="448">the panel goes dark.</text>
+
+<text class="e" x="1010" y="380">Any key</text>
+<text class="s" x="1010" y="404">Wakes it in 1.1 s</text>
+<text class="s" x="1010" y="426">and does nothing else.</text>
+
+<rect class="frame" x="842" y="112" width="176" height="124" rx="10"/>
+<g transform="translate(930,174)" data-path-scale="3.4">
+<!--@AOD_PATH-->
+<circle class="st" r="6"/>
+</g>
+<text class="s" x="1034" y="134">The dim clock's</text>
+<text class="s" x="1034" y="156">path: 44 × 28 px,</text>
+<text class="s" x="1034" y="178">one step every</text>
+<text class="s" x="1034" y="200">4 min, no motion</text>
+<text class="s" x="1034" y="222">in between.</text>
+
+<circle class="now" r="7"/>
+</svg>

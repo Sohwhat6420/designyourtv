@@ -21,7 +21,9 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT = path.resolve(HERE, "..");
 const SRC = path.join(HERE, "tv-dream");
 const OUT = path.join(PROJECT, "apk", "tv-dream");
-const SDK = process.env.ANDROID_SDK_ROOT || process.env.ANDROID_HOME || path.join(os.homedir(), "AppData", "Local", "Android", "Sdk");
+// Android Studio's default SDK place on each OS, unless ANDROID_SDK_ROOT or ANDROID_HOME says otherwise
+const SDK = process.env.ANDROID_SDK_ROOT || process.env.ANDROID_HOME || (process.platform === "win32" ? path.join(os.homedir(), "AppData", "Local", "Android", "Sdk")
+  : process.platform === "darwin" ? path.join(os.homedir(), "Library", "Android", "sdk") : path.join(os.homedir(), "Android", "Sdk"));
 const JAVA_HOME = process.env.JAVA_HOME;
 if (!JAVA_HOME) { console.error("set JAVA_HOME to a JDK 17 (for example the Microsoft Build of OpenJDK)"); process.exit(1); }
 const VERSION = { code: 32, name: "1.0.31" };
@@ -54,17 +56,29 @@ function run(file, args, opt = {}) {
 function latest(dir) { return fs.readdirSync(dir).sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).pop(); }
 function walk(dir, ext) { return fs.readdirSync(dir, { withFileTypes: true }).flatMap(d => d.isDirectory() ? walk(path.join(dir, d.name), ext) : d.name.endsWith(ext) ? [path.join(dir, d.name)] : []); }
 
-/* 1. memory gate (device rule: nothing heavy at or above 75 % committed) */
+/* 1. memory check: a warning by default; TV_BUILD_MEMORY_GATE=<percent> makes it a stop (a shared or small machine) */
 function memoryGate() {
-  const out = run("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command",
-    "$o=Get-CimInstance Win32_OperatingSystem; [string]::Format('{0} {1}', ($o.TotalVirtualMemorySize-$o.FreeVirtualMemory), $o.TotalVirtualMemorySize)"]);
-  const [used, total] = out.trim().split(/\s+/).map(Number);
+  let used, total;
+  if (WIN) {
+    try {
+      const out = run("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command",
+        "$o=Get-CimInstance Win32_OperatingSystem; [string]::Format('{0} {1}', ($o.TotalVirtualMemorySize-$o.FreeVirtualMemory), $o.TotalVirtualMemorySize)"]);
+      [used, total] = out.trim().split(/\s+/).map(Number);           // KB, commit charge
+    } catch { /* fall through to os.freemem */ }
+  }
+  if (!(used > 0 && total > 0)) { total = os.totalmem() / 1024; used = total - os.freemem() / 1024; }
   const pct = Math.round(100 * used / total);
-  log(`memory: ${(used / 1048576).toFixed(1)} of ${(total / 1048576).toFixed(1)} GB committed (${pct} %)`);
-  if (pct >= 75) { console.error(`memory gate: ${pct} % committed is at or above 75 %; not building. Close something, then run again.`); process.exit(5); }
+  log(`memory: ${(used / 1048576).toFixed(1)} of ${(total / 1048576).toFixed(1)} GB in use (${pct} %)`);
+  const gate = Number(process.env.TV_BUILD_MEMORY_GATE);
+  if (gate > 0 && pct >= gate) { console.error(`memory gate: ${pct} % is at or above TV_BUILD_MEMORY_GATE=${gate} %; not building. Close something, then run again.`); process.exit(5); }
+  if (pct >= 90) log("warning: memory is tight; the build needs about 1 GB for a minute");
 }
 
-const javac = path.join(JAVA_HOME, "bin", "javac.exe"), java = path.join(JAVA_HOME, "bin", "java.exe"), jar = path.join(JAVA_HOME, "bin", "jar.exe"), keytool = path.join(JAVA_HOME, "bin", "keytool.exe");
+// Windows names its tools .exe/.bat; macOS and Linux have the same tools without an extension.
+const WIN = process.platform === "win32";
+const exe = name => WIN ? `${name}.exe` : name, script = name => WIN ? `${name}.bat` : name;
+const javac = path.join(JAVA_HOME, "bin", exe("javac")), java = path.join(JAVA_HOME, "bin", exe("java")), jar = path.join(JAVA_HOME, "bin", exe("jar")), keytool = path.join(JAVA_HOME, "bin", exe("keytool"));
+for (const t of [javac, java, jar, keytool]) if (!fs.existsSync(t)) { console.error(`JAVA_HOME has no ${path.basename(t)} (${t}): point JAVA_HOME at a JDK 17, not a JRE`); process.exit(1); }
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "designyourtv-build-"));
 
 /* 2. unit tests: the pure-Java core on the laptop's JVM */
@@ -85,10 +99,13 @@ if (testOnly) { unitTests(); process.exit(0); }
 memoryGate();
 unitTests();
 
-const bt = path.join(SDK, "build-tools", latest(path.join(SDK, "build-tools")));
+const btDir = path.join(SDK, "build-tools");
+if (!fs.existsSync(btDir)) { console.error(`no Android SDK build-tools under ${SDK}: install them (sdkmanager "build-tools;34.0.0" "platforms;android-34"), or set ANDROID_HOME`); process.exit(1); }
+const bt = path.join(btDir, latest(btDir));
 const androidJar = path.join(SDK, "platforms", `android-${COMPILE_SDK}`, "android.jar");
-if (!fs.existsSync(androidJar)) { console.error(`missing ${androidJar}`); process.exit(1); }
-const aapt2 = path.join(bt, "aapt2.exe"), aapt = path.join(bt, "aapt.exe"), d8 = path.join(bt, "d8.bat"), zipalign = path.join(bt, "zipalign.exe"), apksigner = path.join(bt, "apksigner.bat");
+if (!fs.existsSync(androidJar)) { console.error(`missing ${androidJar}: sdkmanager "platforms;android-${COMPILE_SDK}"`); process.exit(1); }
+const aapt2 = path.join(bt, exe("aapt2")), aapt = path.join(bt, exe("aapt")), d8 = path.join(bt, script("d8")), zipalign = path.join(bt, exe("zipalign")), apksigner = path.join(bt, script("apksigner"));
+for (const t of [aapt2, aapt, d8, zipalign, apksigner]) if (!fs.existsSync(t)) { console.error(`build-tools ${path.basename(bt)} has no ${path.basename(t)}: install build-tools 34 or newer`); process.exit(1); }
 log(`build-tools ${path.basename(bt)}, android-${COMPILE_SDK}, JDK ${JAVA_HOME}`);
 
 /* 3. resources and assets (the offline page plus the plate it shows, copied from plates/), in a staged copy with the hub */

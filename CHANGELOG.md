@@ -2,6 +2,40 @@
 
 Dates are in Singapore time. The project is pre-1.0, so anything may change between minor versions.
 
+## Unreleased
+
+- **TV: the music card no longer hides the dock's labels.** With the dock up, the card covered most of the focused
+  app's name for every app under it; it now sits 14.4cqw up instead of 11.6cqw.
+- **TV: "resets Fri 10:00"**, not "resets in Fri 10:00", on the Claude limits card.
+- **README media, all filmed from the real page:** the two oil paintings in rotation with the page's own change, a 2x
+  depth close-up, the four clocks, a rotating card of every glass widget on the painting it sits on, the dock, and banners
+  for the social preview and LinkedIn. `tools/readme-media/` films them with the page's `?measure` hooks and measures
+  the "By the numbers" table ([docs/numbers.md](docs/numbers.md)).
+- **`demo.mjs --config <file>`** starts the demo from your own config.
+
+## 0.2.0 (14 Nov 2026)
+
+First-run fixes: what a clean install on a Google TV runs into, reproduced against a fake TV and fixed.
+
+- **Installs no longer refused on a fresh TV.** The guard refused an install over TV Settings (where turning on
+  debugging leaves you), over the Android TV launcher, and every evening, because the time gate was one household's
+  viewing hours in Singapore time. Installs now go out over the home screen and TV Settings; quiet hours are off by
+  default and set per household (`TV_GUARD_QUIET_HOURS`, `TV_GUARD_TZ` or `devices/tv-guard.json`).
+- **Refusals say what to do.** "Press Home on the remote", "press any button so the home screen shows", or check
+  `adb devices`.
+- **`tv-apply --first-run`** does the whole install in one logged, undoable run: the app and its grants, the music
+  card's reader (it was never allowed, so the card could not follow the TV), and the screensaver chosen and switched
+  on (`screensaver_enabled` was missing from the steps).
+- **Home takeover is opt-in.** The app switched its accessibility service on by itself after an install, a
+  reboot or an update, and undid your removal of it. It now does so only after `tv-apply --home-key on`, which merges
+  with any services you already have; `--home-key off` hands Home back for good.
+- **`build-tv-apk.mjs` runs on macOS and Linux** (it named Windows `.exe` and `.bat` tools), says which SDK piece is
+  missing, and only warns about memory unless `TV_BUILD_MEMORY_GATE` is set.
+- **The hub prints the `--hub` address to build with,** and on Windows the firewall hint.
+- **Tests:** a first run against a fake TV over a fake adb with the real guard (`tools/test/first-run.test.mjs`),
+  quiet hours, the setup screens, and `--first-run` and `--home-key` undo round trips in the self-test.
+- **README:** a new hero, a four-step install that matches the tools, and an "If something is off" table.
+
 ## 0.1.0 (11 Nov 2026)
 
 The first public release.

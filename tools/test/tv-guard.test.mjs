@@ -5,7 +5,10 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { parseForeground, classifyShell, classifyShellLine, classifyAdb, decide, check, guardedAdb, requireOk, inEvening, sgtHour,
-  eveningAllowed, isOurs, FOREGROUND_CMD } from "../tv-guard.mjs";
+  eveningAllowed, isOurs, FOREGROUND_CMD, quietHours, parseQuiet, inQuiet } from "../tv-guard.mjs";
+
+delete process.env.TV_GUARD_QUIET_HOURS;            // the tests name their own quiet hours
+process.env.TV_GUARD_CONFIG = path.join(os.tmpdir(), "no-such-tv-guard.json");
 
 process.env.TV_GUARD_LOG = path.join(fs.mkdtempSync(path.join(os.tmpdir(), "tvguard-")), "guard.log");
 
@@ -121,16 +124,63 @@ test("decide: the explicit-user power-off passes over a foreign app, and nothing
   assert.equal(decide("home", yt, { now: DAY, explicit: true }).ok, false);
 });
 
-test("time gate: 18:00 to 01:00 SGT refuses even our own app in front, unless he allowed it", () => {
+test("quiet hours: once set (18-1 Singapore), they refuse even our own app in front, unless lifted", () => {
   assert.equal(sgtHour(EVE), 20); assert.equal(sgtHour(DAY), 12);
   assert.equal(inEvening(EVE), true); assert.equal(inEvening(NIGHT), true); assert.equal(inEvening(OPEN), false); assert.equal(inEvening(DAY), false);
   const ours = parseForeground(OURS);
-  assert.equal(decide("input", ours, { now: EVE, allowEvening: false }).ok, false);
-  assert.match(decide("input", ours, { now: EVE, allowEvening: false }).reason, /time gate/);
-  assert.equal(decide("input", ours, { now: NIGHT, allowEvening: false }).ok, false);
-  assert.equal(decide("input", ours, { now: EVE, allowEvening: true }).ok, true);
-  assert.equal(decide("input", ours, { now: OPEN, allowEvening: false }).ok, true);
-  assert.equal(decide("input", ours, { now: EVE, allowEvening: false, gate: "none" }).ok, true, "the hub's power commands come from the person in the room, not a script");
+  const quiet = { from: 18, to: 1, tz: "Asia/Singapore" };
+  assert.equal(decide("input", ours, { now: EVE, allowEvening: false, quiet }).ok, false);
+  assert.match(decide("input", ours, { now: EVE, allowEvening: false, quiet }).reason, /quiet hours: 18:00-1:00 \(Asia\/Singapore\)/);
+  assert.equal(decide("input", ours, { now: NIGHT, allowEvening: false, quiet }).ok, false);
+  assert.equal(decide("input", ours, { now: EVE, allowEvening: true, quiet }).ok, true);
+  assert.equal(decide("input", ours, { now: OPEN, allowEvening: false, quiet }).ok, true);
+  assert.equal(decide("input", ours, { now: EVE, allowEvening: false, gate: "none", quiet }).ok, true, "the hub's power commands come from the person in the room, not a script");
+});
+
+test("quiet hours: none by default, so a first install at 20:05 is not refused for one household's evening", () => {
+  const home = parseForeground(LAUNCHER);
+  assert.equal(decide("install", home, { now: EVE, allowEvening: false, quiet: null }).ok, true);
+  assert.equal(quietHours({}, path.join(os.tmpdir(), "no-such-tv-guard.json")), null);
+});
+
+test("quiet hours: read from TV_GUARD_QUIET_HOURS + TV_GUARD_TZ, or devices/tv-guard.json; garbage means none", () => {
+  const none = path.join(os.tmpdir(), "no-such-tv-guard.json");
+  assert.deepEqual(quietHours({ TV_GUARD_QUIET_HOURS: "18-1", TV_GUARD_TZ: "Asia/Singapore" }, none), { from: 18, to: 1, tz: "Asia/Singapore" });
+  assert.deepEqual(quietHours({ TV_GUARD_QUIET_HOURS: "19-23" }, none), { from: 19, to: 23, tz: undefined });
+  assert.equal(quietHours({ TV_GUARD_QUIET_HOURS: "evening" }, none), null);
+  assert.equal(quietHours({ TV_GUARD_QUIET_HOURS: "5-5" }, none), null);
+  assert.equal(quietHours({ TV_GUARD_QUIET_HOURS: "18-1", TV_GUARD_TZ: "Not/AZone" }, none).tz, undefined, "a bad zone falls back to this computer's");
+  const f = path.join(fs.mkdtempSync(path.join(os.tmpdir(), "tvquiet-")), "tv-guard.json");
+  fs.writeFileSync(f, JSON.stringify({ quiet_hours: "18-1", tz: "Europe/London" }));
+  assert.deepEqual(quietHours({}, f), { from: 18, to: 1, tz: "Europe/London" });
+  assert.equal(parseQuiet("9-17").from, 9); assert.equal(parseQuiet("25-3"), null);
+  // a same-day window and a window across midnight, each in its own zone
+  assert.equal(inQuiet(DAY, { from: 9, to: 17, tz: "Asia/Singapore" }), true);
+  assert.equal(inQuiet(EVE, { from: 9, to: 17, tz: "Asia/Singapore" }), false);
+  assert.equal(inQuiet(EVE, { from: 18, to: 1, tz: "Europe/London" }), false, "20:03 in Singapore is 12:03 in London");
+  assert.equal(inQuiet(EVE, null), false);
+});
+
+test("first run: an install passes over the TV's Settings app and the home screens, never over an app someone watches", () => {
+  for (const front of ["com.android.tv.settings", "com.xiaomi.mitv.settings", "com.google.android.leanbacklauncher", "com.google.android.apps.tv.launcherx", "com.mitv.tvhome"])
+    assert.equal(decide("install", parseForeground(dump("Awake", front)), { now: DAY, quiet: null }).ok, true, front);
+  assert.equal(decide("install", parseForeground(YT), { now: DAY, quiet: null }).ok, false);
+  // Settings is a setup screen for installs only: the hub never sleeps or keys the TV under someone in Settings
+  const settings = parseForeground(dump("Awake", "com.android.tv.settings"));
+  for (const kind of ["sleep", "home", "input", "launch", "stop"]) assert.equal(decide(kind, settings, { now: DAY, quiet: null }).ok, false, kind);
+});
+
+test("first run: a screensaver or a sleeping TV refuses with what to press, not a riddle", () => {
+  const dreaming = decide("install", parseForeground(dump("Dreaming", "com.google.android.apps.tv.launcherx")), { now: DAY, quiet: null });
+  assert.equal(dreaming.ok, false);
+  assert.match(dreaming.reason, /screensaver is running.*press any button on the remote/);
+  assert.match(decide("install", parseForeground(YT), { now: DAY, quiet: null }).reason, /Press Home on the remote/);
+});
+
+test("classify: allowing our own now-playing reader is a setting; anyone else's is not", () => {
+  assert.equal(classifyShell("cmd notification allow_listener dev.designyourtv/dev.designyourtv.NowPlaying").kind, "setting");
+  assert.equal(classifyShell("cmd notification disallow_listener dev.designyourtv/dev.designyourtv.NowPlaying").kind, "setting");
+  assert.equal(classifyShell("cmd notification allow_listener com.evil/.Spy").kind, "unknown");
 });
 
 test("time gate: the allow file lifts it only until its expiry, and the env switch lifts it", () => {
@@ -181,7 +231,8 @@ test("requireOk: throws an error that starts with the lane-visible marker", asyn
   assert.equal((await requireOk({ kind: "reload", run: fakeRun(OURS), now: DAY, who: "t" })).ok, true);
 });
 
-test("ours: exactly our app and launcherx", () => {
+test("ours: exactly our app and the stock home screens", () => {
   assert.equal(isOurs("dev.designyourtv"), true); assert.equal(isOurs("com.google.android.apps.tv.launcherx"), true);
+  assert.equal(isOurs("com.android.tv.settings"), false, "Settings passes for an install only, through SETUP_SCREENS");
   assert.equal(isOurs("com.google.android.youtube.tv"), false); assert.equal(isOurs(null), false);
 });

@@ -10,11 +10,13 @@
 //   kinds: input launch home stop reload install display brightness power sleep wake setting unknown
 //
 // It reads `dumpsys activity activities` (mResumedActivity and mFocusedApp) and refuses unless EVERY foreground package is ours
-// or launcherx. It fails closed: an unreadable or unparseable answer is a refusal (only `wake` fails open, since a wake key
-// never changes the foreground). It also refuses force-stopping any other app whatever is in front, and refuses
-// screen-changing actions between 18:00 and 01:00 SGT (when he watches) unless he allowed it in devices/tv-guard-allow.json
-// or TV_GUARD_ALLOW_EVENING=1. Every verdict is appended to devices/tv-guard.log. Read-only commands are never gated.
-// Every child process is windowsHide; nothing here pops a window.
+// or a home screen (an install also passes over the TV's own Settings app, where enabling debugging leaves you). It fails
+// closed: an unreadable or unparseable answer is a refusal (only `wake` fails open, since a wake key never changes the
+// foreground). It also refuses force-stopping any other app whatever is in front. Optional quiet hours (when someone
+// usually watches): TV_GUARD_QUIET_HOURS=18-1 (and TV_GUARD_TZ=<IANA zone>, default this computer's), or the same keys in
+// devices/tv-guard.json; inside them screen-changing actions are refused unless devices/tv-guard-allow.json or
+// TV_GUARD_ALLOW_EVENING=1 lifts it. There are none by default. Every verdict is appended to devices/tv-guard.log.
+// Read-only commands are never gated. Every child process is windowsHide; nothing here pops a window.
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -27,11 +29,16 @@ export const SERIAL = process.env.TV_SERIAL || "192.168.1.20:5555";
 // Ours, plus the HOME screens (nobody is watching a home screen): launcherx, and the stock launchers a fresh TV sits on before our
 // app is installed (Xiaomi PatchWall, the AOSP TV launcher), so the public installer's first run is not refused. Only
 // dev.designyourtv may ever be force-stopped. No streaming, video or music app is ever on this list.
-export const OUR_PACKAGES = ["dev.designyourtv", "com.google.android.apps.tv.launcherx", "com.mitv.tvhome.atv", "com.google.android.tvlauncher"];
-export const EVENING = { from: 18, to: 1 };                      // SGT hours: [18:00, 01:00)
+export const OUR_PACKAGES = ["dev.designyourtv", "com.google.android.apps.tv.launcherx", "com.mitv.tvhome.atv", "com.mitv.tvhome",
+  "com.google.android.tvlauncher", "com.google.android.leanbacklauncher"];
+// The TV's own Settings apps. Turning on developer options and debugging leaves you there, so a first install must not be
+// refused over them; nobody is watching a settings page. Only an install (our APK) passes over them: a key, a launch, a
+// sleep or a stop still needs ours or a home screen in front, so the hub never puts the TV to sleep under someone in Settings.
+export const SETUP_SCREENS = ["com.android.tv.settings", "com.android.settings", "com.xiaomi.mitv.settings"];
 export const REFUSED_EXIT = 9;
 const logFile = () => process.env.TV_GUARD_LOG || path.join(PROJECT, "devices", "tv-guard.log");
 const allowFile = () => process.env.TV_GUARD_ALLOW || path.join(PROJECT, "devices", "tv-guard-allow.json");
+const configFile = () => process.env.TV_GUARD_CONFIG || path.join(PROJECT, "devices", "tv-guard.json");
 
 function findAdb() {
   if (process.env.TV_ADB) return process.env.TV_ADB;
@@ -89,6 +96,8 @@ export function classifyShell(segment) {
   if (/^wm\s+(size|density|overscan)\s+\S/.test(c)) return { kind: "display" };
   if ((m = /^settings\s+(put|delete)\s+(\w+)\s+(\w+)/.exec(c))) return { kind: BRIGHTNESS_KEYS.test(m[3]) ? "brightness" : "setting", key: m[3] };
   if (/^(pm\s+(grant|revoke)|appops\s+set)\b/.test(c)) return { kind: "setting" };
+  // letting our own now-playing reader see media sessions: a permission, nothing on screen changes
+  if (/^cmd\s+notification\s+(allow|disallow)_listener\s+dev\.designyourtv\/\S+$/.test(c)) return { kind: "setting" };
   if (/^(reboot|poweroff|shutdown)\b/.test(c)) return { kind: "power" };
   if (READ_ONLY_SHELL.test(c)) return { kind: "read" };
   return { kind: "unknown" };
@@ -119,12 +128,42 @@ export function classifyAdb(argv) {
   return { kind: "unknown" };
 }
 
-// ---------- the time gate ----------
-/** Hour 0-23 in Singapore. */
-export function sgtHour(now = Date.now()) {
-  return Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Singapore", hour: "2-digit", hourCycle: "h23" }).format(now));
+// ---------- the time gate (optional quiet hours) ----------
+/** Hour 0-23 in a time zone (default: this computer's). */
+export function localHour(now = Date.now(), tz = undefined) {
+  return Number(new Intl.DateTimeFormat("en-GB", { timeZone: tz, hour: "2-digit", hourCycle: "h23" }).format(now));
 }
-export const inEvening = (now = Date.now()) => { const h = sgtHour(now); return h >= EVENING.from || h < EVENING.to; };
+export const sgtHour = (now = Date.now()) => localHour(now, "Asia/Singapore");
+
+/** "18-1" -> { from: 18, to: 1 }; anything else -> null. */
+export function parseQuiet(text) {
+  const m = /^\s*(\d{1,2})\s*-\s*(\d{1,2})\s*$/.exec(String(text ?? ""));
+  if (!m) return null;
+  const from = Number(m[1]), to = Number(m[2]);
+  return from <= 23 && to <= 24 && from !== to ? { from, to: to % 24 } : null;
+}
+
+/** The quiet hours in force: TV_GUARD_QUIET_HOURS (+ TV_GUARD_TZ), else devices/tv-guard.json {quiet_hours, tz}, else none. */
+export function quietHours(env = process.env, file = configFile()) {
+  let spec = env.TV_GUARD_QUIET_HOURS, tz = env.TV_GUARD_TZ;
+  if (spec === undefined) {
+    try { const j = JSON.parse(fs.readFileSync(file, "utf8")); spec = j.quiet_hours; tz = tz || j.tz; } catch { /* no file: no quiet hours */ }
+  }
+  const q = parseQuiet(spec);
+  if (!q) return null;
+  if (tz) { try { new Intl.DateTimeFormat("en-GB", { timeZone: tz }); } catch { tz = undefined; } }
+  return { ...q, tz: tz || undefined };
+}
+
+/** Inside the quiet hours q ({from, to, tz}); never when q is null. */
+export function inQuiet(now = Date.now(), q = quietHours()) {
+  if (!q) return false;
+  const h = localHour(now, q.tz);
+  return q.from < q.to ? h >= q.from && h < q.to : h >= q.from || h < q.to;
+}
+/** The original household's hours (18:00-01:00 Singapore), kept for callers that name them. */
+export const EVENING = { from: 18, to: 1, tz: "Asia/Singapore" };
+export const inEvening = (now = Date.now()) => inQuiet(now, EVENING);
 
 /** devices/tv-guard-allow.json: {"evening_until": ISO}. Written by a session only on his word, in chat. */
 export function eveningAllowed(now = Date.now(), file = allowFile(), env = process.env) {
@@ -148,15 +187,21 @@ export function decide(kind, fg, opts = {}) {
     if (fg.packages.length && fg.packages.every(isOurs)) return { ok: true, reason: "ours is in front" };
     return { ok: false, reason: `wake key while ${fg.packages.join(", ") || "something"} is in front` };
   }
-  if (!fg) return { ok: false, reason: "could not read what is in front (dumpsys failed or the TV is away): refusing, fail-closed" };
-  if (opts.gate !== "none" && inEvening(now) && !(opts.allowEvening ?? eveningAllowed(now))) return { ok: false, reason: `time gate: ${EVENING.from}:00-0${EVENING.to}:00 SGT is when he watches; no TV lane runs now (devices/tv-guard-allow.json lets him lift it)` };
-  if (fg.wakefulness && fg.wakefulness !== "Awake") return { ok: false, reason: `TV is ${fg.wakefulness}: a ${kind} action would wake it or does nothing useful` };
+  if (!fg) return { ok: false, reason: "could not read what is in front (dumpsys failed or the TV is away): refusing, fail-closed. Check `adb devices` lists the TV as \"device\", then run again" };
+  const q = opts.quiet !== undefined ? opts.quiet : quietHours();
+  if (opts.gate !== "none" && inQuiet(now, q) && !(opts.allowEvening ?? eveningAllowed(now)))
+    return { ok: false, reason: `quiet hours: ${q.from}:00-${q.to}:00${q.tz ? ` (${q.tz})` : ""} are set as viewing time, so nothing changes the screen now (TV_GUARD_ALLOW_EVENING=1 or devices/tv-guard-allow.json lifts it)` };
+  if (fg.wakefulness && fg.wakefulness !== "Awake") {
+    const how = fg.wakefulness === "Dreaming" ? "a screensaver is running" : "the TV is asleep";
+    return { ok: false, reason: `TV is ${fg.wakefulness} (${how}): press any button on the remote so the home screen shows, then run this again` };
+  }
   if (!fg.packages.length) return { ok: false, reason: "no resumed activity could be parsed: refusing, fail-closed" };
   // opts.allowPackages: apps the caller itself launched in this run (the launch bench). Never a way to name YouTube in advance.
-  const foreign = fg.packages.filter(p => !isOurs(p) && !(opts.allowPackages || []).includes(p));
+  const passes = p => isOurs(p) || (kind === "install" && SETUP_SCREENS.includes(p)) || (opts.allowPackages || []).includes(p);
+  const foreign = fg.packages.filter(p => !passes(p));
   if (foreign.length) {
     if ((kind === "sleep" || kind === "brightness") && opts.explicit) return { ok: true, reason: `explicit user power-off while ${foreign.join(", ")} is in front` };
-    return { ok: false, reason: `${foreign.join(", ")} is in front (resumed=${fg.resumed}, focused=${fg.focused}): a ${kind} action is refused` };
+    return { ok: false, reason: `${foreign.join(", ")} is in front (resumed=${fg.resumed}, focused=${fg.focused}): a ${kind} action is refused. Press Home on the remote, then run this again` };
   }
   return { ok: true, reason: `ours is in front (${fg.packages.join(", ")})` };
 }
@@ -248,7 +293,7 @@ async function main(argv) {
   if (cmd === "status") {
     const r = await defaultRun(ADB, ["-s", SERIAL, "shell", FOREGROUND_CMD], 8e3).catch(e => ({ out: "", err: e.message }));
     const fg = parseForeground(r.out);
-    console.log(JSON.stringify({ ...fg, ours: fg.packages.length > 0 && fg.packages.every(isOurs), evening: inEvening(), eveningAllowed: eveningAllowed(), error: fg.packages.length || fg.wakefulness ? undefined : (r.err || "no answer").trim() }, null, 1));
+    console.log(JSON.stringify({ ...fg, ours: fg.packages.length > 0 && fg.packages.every(isOurs), quietHours: quietHours(), inQuietHours: inQuiet(), eveningAllowed: eveningAllowed(), error: fg.packages.length || fg.wakefulness ? undefined : (r.err || "no answer").trim() }, null, 1));
     return 0;
   }
   if (cmd === "check") {

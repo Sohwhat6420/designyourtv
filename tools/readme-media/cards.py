@@ -1,0 +1,190 @@
+"""The README's rotating card of the TV's glass widgets, one SVG per GitHub theme, no script: CSS only.
+
+    python tools/readme-media/cards.py <slides dir> [<assets dir>]     (slides from crop.py)
+
+Each slide is an unedited crop of the TV page as Chromium drew it (film-stills.mjs, crop.py); the card the slide is
+about is lit, the rest of the frame dimmed. The rotation is the profile README's (github.com/Sohwhat6420/Sohwhat6420,
+tools/hero.py): slides stacked, the first never fades, each new one dissolves in over the TV's 1.05 s and settles
+from 1.04 while the one it covers pushes in, and the captions leave and arrive on the TV's date-line timing. The glass
+panel, the sheen sweep and the rim pulse are the profile's repo cards' (koilib.glass, .rc*s, .rc*c).
+"""
+import base64, json, os, sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from svglib import Doc, f, font  # noqa: E402
+
+SLIDES = [  # (card, title, what it shows: from tv-setup.html and the hub's readers)
+    ("calendar", "Calendar", "The month at a glance, with today ringed in the painting's own accent."),
+    ("next", "Next event", "The next entry from any ICS calendar feed, counting down to it."),
+    ("buses", "Bus arrivals", "Live arrivals from Singapore's LTA DataMall, smoothed so a bus never drops out for one bad reading."),
+    ("batteries", "Batteries", "Phone, tablet, watch and earbuds as rings, read over adb from the phones themselves."),
+    ("limits", "Claude limits", "Session and weekly use of a Claude plan, from a small headless probe at most every 10 minutes."),
+    ("heatmap", "Claude Code", "Daily Claude Code activity, read from its own transcripts. Until the hub has some, the card says it is a sample."),
+    ("today", "Weekly pace", "How much of the weekly limit today allows (86 %) against what is used (41 %)."),
+    ("music", "Now playing", "Follows whatever the TV itself is playing, with pause and skip."),
+]
+PLATES = {"f22-alaska": "Raptors over Alaska", "f22-thunderhead": "F-22 against the thunderhead",
+          "placeholder": "Valley at dusk", "placeholder-dawn": "Valley at dawn"}
+THEMES = {  # the profile's (koilib.THEMES): type, accents and ghost glass
+    "dark": dict(text="#f4f3ef", dim="#b8bcc4", faint="#8f949c", gold="#d9b77a", accent="#ffb340",
+                 gBase="rgba(28,32,39,.56)", gHiA="rgba(255,255,255,.07)", gHiB="rgba(255,255,255,.01)",
+                 gGlow="#ffffff", gGlowOp=0.035, gGrain="#ffffff", gGrainOp=0.05, gRing="#ffffff", gRingOp=0.15,
+                 gSheen="#ffffff", gSheenOp=0.42, gShadow="#000000", gShadowOp=0.52, track="rgba(255,255,255,.14)", win="#0b0d10"),
+    "light": dict(text="#14161a", dim="#4c5058", faint="#5d636c", gold="#7a5612", accent="#9a4f00",
+                  gBase="#f5f1e8", gHiA="rgba(255,255,255,.5)", gHiB="rgba(240,232,216,.35)",
+                  gGlow="#ffffff", gGlowOp=0.6, gGrain="#3c280a", gGrainOp=0.012, gRing="#3c280a", gRingOp=0.10,
+                  gSheen="#ffffff", gSheenOp=0.88, gShadow="#0a1428", gShadowOp=0.22, track="rgba(20,22,26,.12)", win="#1a1714"),
+}
+W, H = 1200, 513
+SX, SY, SW, SH = 24, 24, 744, 465           # the slide window, 16:10
+STEP = 5.5                                  # each slide's turn, s
+LEAD = 2.4                                  # every animation starts this far in: the first paint is the Calendar, mid-hold
+T = dict(settle=1.5, out=0.35, gap=0.1, inn=0.5, capOut=0.3, capIn=0.4)   # a dip, not a cross-fade: two crops never overlap
+EASE = dict(dolly="cubic-bezier(.45,.05,.25,1)", settle="cubic-bezier(.22,1,.36,1)")
+
+
+
+# --- glass(): copied verbatim from the profile's tools/koi/koilib.py (commit a5ecb7f)
+def glass(doc, T, x, y, w, h, r, shadow=True, sd=9.0):
+    """One ghost-glass panel: soft shadow, translucent fill, light gradient and glow, grain, top-edge sheen and a
+    hairline ring. Returns the SVG; the content goes on top. Every def gets this doc's own ids."""
+    k = doc.uid("gl")
+    rect = 'x="%s" y="%s" width="%s" height="%s" rx="%s"' % (f(x, 2), f(y, 2), f(w, 2), f(h, 2), f(r, 2))
+    doc.defs.append('<clipPath id="%sc"><rect %s/></clipPath>' % (k, rect))
+    # the TV's sheen: light over the top half, gone by 48 %, then a faint shade towards the foot
+    doc.defs.append('<linearGradient id="%sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="%s"/>'
+                    '<stop offset=".48" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="%s"/></linearGradient>'
+                    % (k, T["gHiA"], T["gHiB"]))
+    doc.defs.append('<radialGradient id="%sr" gradientUnits="userSpaceOnUse" cx="%s" cy="%s" r="%s">'
+                    '<stop offset="0" stop-color="%s" stop-opacity="%s"/><stop offset="1" stop-color="%s" stop-opacity="0"/>'
+                    '</radialGradient>' % (k, f(x + w * 0.18, 1), f(y - h * 0.1, 1), f(max(w, h) * 0.75, 1),
+                                           T["gGlow"], f(T["gGlowOp"], 3), T["gGlow"]))
+    doc.defs.append('<linearGradient id="%ss" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="%s" stop-opacity="0"/>'
+                    '<stop offset=".22" stop-color="%s" stop-opacity="%s"/><stop offset=".78" stop-color="%s" stop-opacity="%s"/>'
+                    '<stop offset="1" stop-color="%s" stop-opacity="0"/></linearGradient>'
+                    % (k, T["gSheen"], T["gSheen"], f(T["gSheenOp"], 3), T["gSheen"], f(T["gSheenOp"] * 0.55, 3), T["gSheen"]))
+    # grain: static fractal noise, its red channel turned into a faint alpha
+    gr, gg, gb = (int(T["gGrain"][i:i + 2], 16) / 255 for i in (1, 3, 5))
+    doc.defs.append('<filter id="%sn" x="0" y="0" width="100%%" height="100%%" color-interpolation-filters="sRGB">'
+                    '<feTurbulence type="fractalNoise" baseFrequency="1.15" numOctaves="2" seed="%d" stitchTiles="stitch"/>'
+                    '<feColorMatrix values="0 0 0 0 %s  0 0 0 0 %s  0 0 0 0 %s  2.2 0 0 0 -.9"/></filter>'
+                    % (k, len(doc.defs) % 97, f(gr, 3), f(gg, 3), f(gb, 3)))
+    out = []
+    if shadow:
+        doc.defs.append('<filter id="%sb" x="-20%%" y="-20%%" width="140%%" height="160%%"><feGaussianBlur stdDeviation="%s"/></filter>'
+                        % (k, f(sd, 2)))
+        inset = min(10.0, w * 0.04)
+        out.append('<rect x="%s" y="%s" width="%s" height="%s" rx="%s" fill="%s" fill-opacity="%s" filter="url(#%sb)"/>'
+                   % (f(x + inset, 2), f(y + sd * 1.7, 2), f(w - 2 * inset, 2), f(h - sd * 2, 2), f(r, 2),
+                      T["gShadow"], f(T["gShadowOp"], 3), k))
+    out.append('<rect %s fill="%s"/>' % (rect, T["gBase"]))
+    out.append('<g clip-path="url(#%sc)"><rect %s fill="url(#%sg)"/><rect %s fill="url(#%sr)"/>'
+               '<rect %s opacity="%s" filter="url(#%sn)"/></g>'
+               % (k, rect, k, rect, k, rect, f(T["gGrainOp"] * 1.6, 3), k))
+    # the top edge catches the light: an inner line along the top, fading round the corners
+    rr = max(0.0, r - 0.6)
+    out.append('<path d="M%s %sa%s %s 0 0 1 %s-%sH%sa%s %s 0 0 1 %s %s" fill="none" stroke="url(#%ss)" stroke-width="1.1"/>'
+               % (f(x + 0.6, 2), f(y + rr, 2), f(rr, 2), f(rr, 2), f(rr, 2), f(rr - 0.6, 2), f(x + w - rr - 0.6, 2),
+                  f(rr, 2), f(rr, 2), f(rr, 2), f(rr - 0.6, 2), k))
+    out.append('<rect x="%s" y="%s" width="%s" height="%s" rx="%s" fill="none" stroke="%s" stroke-opacity="%s"/>'
+               % (f(x + 0.5, 2), f(y + 0.5, 2), f(w - 1, 2), f(h - 1, 2), f(max(0, r - 0.5), 2), T["gRing"], f(T["gRingOp"], 3)))
+    return "".join(out)
+
+# ----------------------------------------------------------------------------------------------
+# the koi
+# ----------------------------------------------------------------------------------------------
+SLIM = 0.8  # body width relative to the first sketch: koi seen from above are long and slim
+PROFILE = [(52, 0), (51, 3.2), (49, 6.4), (46, 9.2), (41, 12.2), (34, 14.8), (25, 16.6), (15, 17.4), (5, 17),
+           (-5, 15.6), (-15, 13.4), (-25, 10.6), (-33, 8), (-40, 6), (-45, 4.8), (-48, 4.3)]
+
+
+
+
+def wrap(s, key, size, width):
+    lines, cur = [], ""
+    for w in s.split():
+        t = (cur + " " + w).strip()
+        if cur and font(key).width(t, size) > width:
+            lines.append(cur); cur = w
+        else:
+            cur = t
+    return lines + [cur]
+
+
+def build(theme, slides_dir):
+    Th = THEMES[theme]
+    meta = json.load(open(os.path.join(slides_dir, "slides.json")))
+    n, cyc = len(SLIDES), len(SLIDES) * STEP
+    pc = lambda t: "%s%%" % f(max(0.0, min(cyc, t)) / cyc * 100, 3)
+    run = lambda name, dur, ease="linear": "animation:%s %ss %s -%ss infinite" % (name, f(dur, 2), ease, f(LEAD, 2))
+    desc = ("The TV's glass widgets, one at a time, each shown on the painting it sits on, in real frames from the demo: "
+            + " ".join("%s: %s" % (t, d) for _, t, d in SLIDES))
+    doc = Doc(W, H, "designyourtv's glass widgets", desc)
+    css = doc.css
+    doc.defs.append('<filter id="bl" x="-5%%" y="-5%%" width="110%%" height="110%%"><feGaussianBlur stdDeviation="3.5"/></filter>')
+    imgs, caps = [], []
+    for i, (card, title, text) in enumerate(SLIDES):
+        m = meta[card]
+        data = base64.b64encode(open(os.path.join(slides_dir, card + ".jpg"), "rb").read()).decode()
+        k = SW / 1120.0
+        cx, cy, cw, ch, cr = (v * k for v in m["card"])
+        hole = 'x="%s" y="%s" width="%s" height="%s" rx="%s"' % (f(SX + cx - 1, 1), f(SY + cy - 1, 1), f(cw + 2, 1), f(ch + 2, 1), f(cr + 1, 1))
+        doc.defs.append('<image id="im%d" href="data:image/jpeg;base64,%s" x="%d" y="%d" width="%d" height="%d" preserveAspectRatio="xMidYMid slice"/>'
+                        % (i, data, SX, SY, SW, SH))
+        doc.defs.append('<mask id="h%d"><rect x="%d" y="%d" width="%d" height="%d" fill="#fff"/><rect %s fill="#000"/></mask>' % (i, SX, SY, SW, SH, hole))
+        # the frame as drawn; outside the card, the same frame softened and veiled, so the card is what you read
+        imgs.append('<g class="s s%d"><g class="d d%d"><use href="#im%d"/><g mask="url(#h%d)"><use href="#im%d" filter="url(#bl)"/>'
+                    '<rect x="%d" y="%d" width="%d" height="%d" fill="#05070a" fill-opacity=".58"/></g>'
+                    '<rect %s fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="1.2"/></g></g>'
+                    % (i, i, i, i, i, SX, SY, SW, SH, hole))
+        # its caption: the title on a fixed baseline, the text under it, the painting at the foot
+        x0, parts = 806, []
+        parts.append(doc.text(title, x0 - 2, 150, "serif", 60, Th["text"])[0])
+        for j, line in enumerate(wrap(text, "h4", 22, 362)):
+            parts.append(doc.text(line, x0, 200 + j * 32, "h4", 22, Th["dim"])[0])
+        parts.append(doc.text("Painting: " + PLATES[m["plate"]], x0, 452, "h5", 15, Th["faint"])[0])
+        caps.append('<g class="c c%d">%s</g>' % (i, "".join(parts)))
+    eyebrow = doc.text("GLASS WIDGETS \u00b7 REAL TV FRAMES", 806, 41, "h6", 15, Th["gold"], tracking=0.12)[0]
+    bw, gap, by = 40, 6, 482
+    track = "".join('<rect x="%s" y="%d" width="%d" height="3" rx="1.5" fill="%s"/>' % (f(806 + k * (bw + gap)), by, bw, Th["track"]) for k in range(n))
+    bars = "".join('<rect class="p p%d" x="%s" y="%d" width="%d" height="3" rx="1.5" fill="%s"/>' % (k, f(806 + k * (bw + gap)), by, bw, Th["accent"]) for k in range(n))
+
+    # ---- motion: slide i holds from i*STEP to (i+1)*STEP; between two slides a dip (out, a breath of window, in)
+    css.append(".s,.c,.p{opacity:0}.s0,.c0,.p0{opacity:1}")
+    css.append(".d{transform-box:view-box;transform-origin:%spx %spx}" % (f(SX + SW / 2), f(SY + SH / 2)))
+    for i in range(n):
+        a, b = i * STEP, (i + 1) * STEP
+        inA, inB, outA = a + T["gap"], a + T["gap"] + T["inn"], b - T["out"]
+        css.append("@keyframes o%d{0%%,%s{opacity:0}%s,%s{opacity:1}%s,100%%{opacity:0}}" % (i, pc(inA), pc(inB), pc(outA), pc(b)))
+        css.append(".s%d{%s}" % (i, run("o%d" % i, cyc, "ease-in-out")))
+        # the camera, the TV's: settling in from 1.04, and a slow push before it leaves
+        css.append("@keyframes z%d{0%%,%s{transform:scale(1.04)}%s{transform:none}%s{transform:none}%s,100%%{transform:translate(-.3%%,-.5%%) scale(1.02)}}"
+                   % (i, pc(inA), pc(inA + T["settle"]), pc(b - 1.6), pc(b)))
+        css.append(".d%d{%s}" % (i, run("z%d" % i, cyc, EASE["settle"])))
+        css.append("@keyframes t%d{0%%,%s{opacity:0}%s,%s{opacity:1}%s,100%%{opacity:0}}" % (i, pc(inA), pc(inA + T["capIn"]), pc(b - T["capOut"]), pc(b)))
+        css.append(".c%d{%s}" % (i, run("t%d" % i, cyc)))
+        css.append("@keyframes q%d{0%%,%s{opacity:0}%s,%s{opacity:1}%s,100%%{opacity:0}}" % (i, pc(a), pc(a + .3), pc(b - .3), pc(b)))
+        css.append(".p%d{%s}" % (i, run("q%d" % i, cyc)))
+    # the profile repo cards' sheen (rc*s): here one pass per slide, in step with it
+    css.append("@keyframes sw{0%%,22%%{transform:translateX(-120%%)}50%%,100%%{transform:translateX(120%%)}}.sw{%s}" % run("sw", STEP, "ease-in-out"))
+    css.append("@media (prefers-reduced-motion: reduce){*{animation:none!important}}")
+    doc.defs.append('<clipPath id="win"><rect x="%d" y="%d" width="%d" height="%d" rx="12"/></clipPath>' % (SX, SY, SW, SH))
+    doc.defs.append('<linearGradient id="swg" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/>'
+                    '<stop offset=".5" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>')
+    doc.body += [glass(doc, Th, 1, 1, W - 2, H - 2, 18, shadow=False),
+                 '<g clip-path="url(#win)"><rect x="%d" y="%d" width="%d" height="%d" fill="%s"/>%s<rect class="sw" x="%d" y="%d" width="%d" height="%d" fill="url(#swg)"/></g>'
+                 % (SX, SY, SW, SH, Th["win"], "".join(imgs), SX, SY, SW, SH),
+                 '<rect x="%s" y="%s" width="%d" height="%d" rx="12" fill="none" stroke="%s" stroke-opacity=".35" stroke-width="1"/>' % (f(SX + .5), f(SY + .5), SW - 1, SH - 1, Th["gold"]),
+                 eyebrow, "".join(caps), track, bars]
+    return doc.render()
+
+
+if __name__ == "__main__":
+    slides = sys.argv[1]
+    assets = sys.argv[2] if len(sys.argv) > 2 else os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "assets")
+    os.makedirs(assets, exist_ok=True)
+    for theme in ("light", "dark"):
+        p = os.path.join(assets, "widgets-%s.svg" % theme)
+        with open(p, "w", encoding="utf-8", newline="\n") as fh:
+            fh.write(build(theme, slides))
+        print("%s  %.0f KB" % (p, os.path.getsize(p) / 1e3))

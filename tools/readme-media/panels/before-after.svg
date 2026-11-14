@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 556" width="1200" height="556" role="img" aria-labelledby="t d">
+<title id="t">Before and after one round of fixes, measured on the same television</title>
+<desc id="d">Five measurements in milliseconds on a logarithmic scale, each shown before and after. Changing the painting, the time the page was frozen reading the picture: 943 to 1,318 ms before, 18 to 25 ms after. Dock sliding at night, slowest single frame: 282 ms before, 37 to 41 ms after. Dock sliding by day, typical frame: 85 ms before, 25 ms after. App drawer opening, typical frame: 57 ms before, 23 ms after. Opening Netflix from the dock, from the press to the hand-over with the app already loaded: 389 ms before, 231 ms after. One Xiaomi television, Android 11, 1,788 MB of RAM, measured on 4 November 2026 with the panel dark.</desc>
+<style>
+/*@FONTS*/
+/*@TOKENS*/svg{--ink:#E6EDF3;--ink2:#9198A1;--rule:#30363D;--mark:#7D8590;--acc:#EBA24A;--accink:#10141F}/*@END*/
+text{font-family:"HG","Hanken Grotesk",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;fill:var(--ink)}
+.h{font-size:19px;fill:var(--ink2)}
+.n{font-size:21px;font-weight:600}
+.s{font-size:17px;fill:var(--ink2)}
+.v{font-size:18px;font-weight:600;text-anchor:middle;font-variant-numeric:tabular-nums}
+.vb{font-size:18px;text-anchor:middle;fill:var(--ink2);font-variant-numeric:tabular-nums}
+.a{font-size:16px;fill:var(--ink2)}
+.am{font-size:16px;fill:var(--ink2);text-anchor:middle}
+.grid{stroke:var(--rule);stroke-width:1}
+.link{stroke:var(--mark);stroke-width:2;stroke-linecap:round;opacity:.42}
+.b{fill:var(--mark)}
+.k{fill:var(--acc)}
+/* the amber mark is the same measurement after the fix: it rests where it is now, and once a loop it starts again from where "before" stands and travels back */
+.go{animation:go 14s cubic-bezier(.22,1,.36,1) infinite backwards}
+@keyframes go{0%{transform:none;opacity:1}6%{transform:none;opacity:1}7.5%{transform:none;opacity:0}7.6%{transform:translateX(var(--d));opacity:0}10%{transform:translateX(var(--d));opacity:1}21%{transform:none;opacity:1}100%{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.go{animation:none}}
+</style>
+<text class="h" x="0" y="24">Before and after one round of fixes, on the same television</text>
+
+<rect class="k" x="519" y="69" width="18" height="10" rx="5"/><text class="a" x="543" y="79">after</text>
+<rect class="b" x="1036" y="69" width="18" height="10" rx="5"/><text class="a" x="1060" y="79">before</text>
+
+<path class="grid" d="M450.5 92V466M595.5 92V466M754.5 92V466M899.5 92V466M1058.5 92V466"/>
+<text class="am" x="450" y="490">10 ms</text><text class="am" x="595" y="490">30</text><text class="am" x="754" y="490">100</text><text class="am" x="899" y="490">300</text><text class="am" x="1058" y="490">1,000 ms</text>
+<text class="a" x="450" y="522">Milliseconds on a logarithmic scale: each line is about three times the one before it.</text>
+<text class="a" x="450" y="545">Further left is quicker.</text>
+
+<g>
+<text class="n" x="0" y="114">Changing the painting</text>
+<text class="s" x="0" y="138">page frozen while it reads the picture</text>
+<path class="link" d="M577 116H1044"/>
+<rect class="b" x="1050.6" y="108" width="44.3" height="16" rx="8"/>
+<text class="vb" x="1072.8" y="98">943 to 1,318 ms</text>
+<rect class="k go" x="527.7" y="108" width="43.3" height="16" rx="8" style="--d:523.4px"/>
+<text class="v" x="549.4" y="98">18 to 25 ms</text>
+</g>
+
+<g>
+<text class="n" x="0" y="194">Dock sliding, at night</text>
+<text class="s" x="0" y="218">slowest single frame</text>
+<path class="link" d="M644 196H877"/>
+<rect class="b" x="883.1" y="188" width="16" height="16" rx="8"/>
+<text class="vb" x="891.1" y="178">282 ms</text>
+<rect class="k go" x="621.6" y="188" width="16" height="16" rx="8" style="--d:261.5px;animation-delay:.25s"/>
+<text class="v" x="629.6" y="178">37 to 41 ms</text>
+</g>
+
+<g>
+<text class="n" x="0" y="274">Dock sliding, by day</text>
+<text class="s" x="0" y="298">typical frame</text>
+<path class="link" d="M585 276H719"/>
+<rect class="b" x="724.7" y="268" width="16" height="16" rx="8"/>
+<text class="vb" x="732.7" y="258">85 ms</text>
+<rect class="k go" x="563" y="268" width="16" height="16" rx="8" style="--d:161.7px;animation-delay:.5s"/>
+<text class="v" x="571" y="258">25 ms</text>
+</g>
+
+<g>
+<text class="n" x="0" y="354">App drawer opening</text>
+<text class="s" x="0" y="378">typical frame</text>
+<path class="link" d="M574 356H666"/>
+<rect class="b" x="671.9" y="348" width="16" height="16" rx="8"/>
+<text class="vb" x="679.9" y="338">57 ms</text>
+<rect class="k go" x="552" y="348" width="16" height="16" rx="8" style="--d:119.9px;animation-delay:.75s"/>
+<text class="v" x="560" y="338">23 ms</text>
+</g>
+
+<g>
+<text class="n" x="0" y="434">Opening Netflix from the dock</text>
+<text class="s" x="0" y="458">press to hand-over, app already loaded</text>
+<path class="link" d="M879 436H920"/>
+<rect class="b" x="925.6" y="428" width="16" height="16" rx="8"/>
+<text class="vb" x="933.6" y="418">389 ms</text>
+<rect class="k go" x="856.8" y="428" width="16" height="16" rx="8" style="--d:68.8px;animation-delay:1s"/>
+<text class="v" x="864.8" y="418">231 ms</text>
+</g>
+</svg>

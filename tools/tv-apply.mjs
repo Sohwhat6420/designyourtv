@@ -14,6 +14,9 @@
 //   $T --settings [--apply]                                  the settings in tv-debloat.json (animation scales)
 //   $T --set secure:screensaver_components=<pkg/.Cls> [--apply]
 //   $T --install-claude [--apk-dir <dir>] [--apply]          Claude: signer + gates checked, then install-multiple
+//   $T --first-run [--apply]                                 a fresh TV in one logged run: our APK + its grants, the music
+//                                                            card's reader, our screensaver chosen and switched on
+//   $T --home-key on|off [--apply]                           Home opens the painting (our accessibility service, merged)
 //   $T --install-dream [--apply]                             our screensaver / Claude-tile APK + its two grants
 //   $T --density <dpi|reset> [--apply]                       `wm density`, the old value logged
 //   $T --launch <pkg/.Activity>                              am start -n (no state change to undo)
@@ -134,6 +137,8 @@ function parseArgs(argv) {
     else if (a === "--install-claude") o.installClaude = true;
     else if (a === "--apk-dir") o.apkDir = v();
     else if (a === "--install-dream") o.installDream = true;
+    else if (a === "--first-run") o.firstRun = true;
+    else if (a === "--home-key") o.homeKey = v();
     else if (a === "--density") o.density = v();
     else if (a === "--launch") o.launch = v();
     else if (a === "--tile") o.tile = v();
@@ -145,6 +150,7 @@ function parseArgs(argv) {
   }
   if (!TIERS[o.tier]) throw new Error(`--tier must be safe, probably or risky`);
   if (o.density !== null && !/^(\d{2,3}|reset)$/.test(o.density)) throw new Error(`--density wants a dpi (e.g. 240) or reset`);
+  if (o.homeKey !== undefined && !/^(on|off)$/.test(o.homeKey)) throw new Error(`--home-key wants on or off`);
   if (o.measure !== null && !/^[\w.-]{1,40}$/.test(o.measure)) throw new Error(`--measure wants a short label (letters, digits, - . _)`);
   if (o.gfx && !PKG_RE.test(o.gfx)) throw new Error(`--gfx wants a package name`);
   if (o.launch && !COMP_RE.test(o.launch)) throw new Error(`--launch wants <pkg>/<.Activity>`);
@@ -657,6 +663,84 @@ async function installDream(adb, ident, opt, print, j) {
   }
 }
 
+/* ---------------- first run: everything a fresh TV needs, in one logged run ---------------- */
+const DREAM_COMP = "dev.designyourtv/.WallDream";
+const LISTENER = "dev.designyourtv/dev.designyourtv.NowPlaying";
+const HOME_KEY_SVC = "dev.designyourtv/.HomeKeyService";
+
+/** The same rules as the APK's A11yList: ':'-separated components; "pkg/.Cls" and "pkg/pkg.Cls" are one component. */
+const fullComp = c => { const k = c.indexOf("/"); if (k < 0) return c; const p = c.slice(0, k), cls = c.slice(k + 1); return `${p}/${cls.startsWith(".") ? p + cls : cls}`.toLowerCase(); };
+const listOf = s => (s && s !== "null" ? s.split(":").map(x => x.trim()).filter(Boolean) : []);
+export function a11yWith(list, svc) { const l = listOf(list); return l.some(x => fullComp(x) === fullComp(svc)) ? null : [...l, svc].join(":"); }
+export function a11yWithout(list, svc) { const l = listOf(list).filter(x => fullComp(x) !== fullComp(svc)); return l.length ? l.join(":") : null; }
+
+/** Settings rows -> logged `settings put` (or `settings delete` for a null value), each with its old value. */
+async function applySettings(adb, sets, opt, print, j) {
+  for (const s of sets) {
+    if (s.value !== null && !SAFE_VALUE.test(s.value)) throw new Refusal(`refusing the value for ${s.key}: only letters, digits and . : / , - _`);
+    const old = firstLine(await adb.sh(`settings get ${s.ns} ${s.key}`));
+    const oldV = old === "null" || old === "" ? null : old;
+    if (oldV === s.value) { print(`  = ${s.ns} ${s.key} is already ${s.value ?? "(unset)"}`); continue; }
+    if (oldV !== null && !SAFE_VALUE.test(oldV)) { print(`  REFUSED ${s.ns} ${s.key}: its current value "${oldV}" could not be put back exactly, so it is left alone`); continue; }
+    print(`  ${opt.apply ? "SET" : "would set"} ${s.ns} ${s.key}: ${oldV ?? "(unset)"} -> ${s.value ?? "(unset)"}`);
+    if (opt.apply) {
+      const i = j.intend({ action: "setting", ns: s.ns, key: s.key, old: oldV, value: s.value });
+      const r = await adb.sh(s.value === null ? `settings delete ${s.ns} ${s.key}` : `settings put ${s.ns} ${s.key} ${s.value}`);
+      j.settle(i, r.code === 0, r.stderr || r.stdout);
+      if (r.code !== 0) print(`    failed: ${(r.stderr || r.stdout).trim()}`);
+    }
+  }
+}
+
+/** Our own now-playing reader may see the TV's media sessions (the music card). Undo: disallow_listener. */
+async function allowListener(adb, opt, print, j) {
+  const cur = firstLine(await adb.sh("settings get secure enabled_notification_listeners"));
+  if (listOf(cur).some(x => fullComp(x) === fullComp(LISTENER))) { print(`  = the music card's reader is already allowed`); return; }
+  print(`  ${opt.apply ? "ALLOW" : "would allow"} the music card's reader (${LISTENER}) to see what the TV is playing`);
+  if (!opt.apply) return;
+  const i = j.intend({ action: "listener", comp: LISTENER });
+  const r = await adb.sh(`cmd notification allow_listener ${LISTENER}`);
+  j.settle(i, r.code === 0, (r.stderr || r.stdout).trim());
+  if (r.code) print(`    failed (the music card will not follow the TV): ${(r.stderr || r.stdout).trim()}`);
+}
+
+/**
+ * --first-run: install our APK with its two grants, let the music card read what is playing, and make the painting the
+ * screensaver (switched on). One undo log; `--undo <log> --apply` takes it all back. The Home button stays Google TV's
+ * unless you also run --home-key on.
+ */
+async function firstRun(adb, ident, opt, print, j, deps = { installDream }) {
+  print("1/3  the app");
+  await deps.installDream(adb, ident, opt, print, j);
+  print("2/3  the music card");
+  await allowListener(adb, opt, print, j);
+  print("3/3  the screensaver");
+  await applySettings(adb, [
+    { ns: "secure", key: "screensaver_components", value: DREAM_COMP },
+    { ns: "secure", key: "screensaver_enabled", value: "1" },
+  ], opt, print, j);
+  if (opt.apply) {
+    print("Done. On the TV: Settings > System > Ambient mode (or Screen saver) > Start now. The painting shows; any arrow raises the dock.");
+    print("If the TV shows the clock and date but no widgets, it cannot reach the hub: see \"If something is off\" in the README.");
+  }
+}
+
+/** --home-key on|off: Home opens the painting (our accessibility service), merged with any services already on. */
+async function homeKey(adb, opt, print, j) {
+  const cur = firstLine(await adb.sh("settings get secure enabled_accessibility_services"));
+  const curV = cur === "null" || cur === "" ? null : cur;
+  const on = opt.homeKey === "on";
+  const next = on ? a11yWith(curV, HOME_KEY_SVC) : a11yWithout(curV, HOME_KEY_SVC);
+  const sets = [];
+  if (on ? next !== null : listOf(curV).length !== listOf(next).length) sets.push({ ns: "secure", key: "enabled_accessibility_services", value: next });
+  if (on) sets.push({ ns: "secure", key: "accessibility_enabled", value: "1" });
+  if (!on && opt.apply) await adb.sh("am broadcast -a dev.designyourtv.HOME_KEY --ez keep false -n dev.designyourtv/.HomeToggle");
+  await applySettings(adb, sets, opt, print, j);
+  // the app keeps the service on after a reboot or an update only while this says so (set here, cleared by --home-key off)
+  if (on && opt.apply) await adb.sh("am broadcast -a dev.designyourtv.HOME_KEY --ez keep true -n dev.designyourtv/.HomeToggle");
+  if (opt.apply) print(on ? "Home now opens the painting a moment after Google TV's own Home. Long-press Home still opens Google TV's panel." : "Home is Google TV's again.");
+}
+
 function parseDensity(text) {
   const phys = Number((/Physical density: (\d+)/.exec(text) || [])[1]) || null;
   const over = Number((/Override density: (\d+)/.exec(text) || [])[1]) || null;
@@ -758,6 +842,8 @@ async function main(opt, run, print = console.log, guard = undefined) {
   };
   if (opt.installClaude) { await installClaude(adb, ident, opt, print, j); if (!opt.apply) print("Dry run: nothing was changed. Add --apply."); return finish(); }
   if (opt.installDream) { await installDream(adb, ident, opt, print, j); if (!opt.apply) print("Dry run: nothing was changed. Add --apply."); return finish(); }
+  if (opt.firstRun) { await firstRun(adb, ident, opt, print, j); if (!opt.apply) print("Dry run: nothing was changed. Add --apply."); return finish(); }
+  if (opt.homeKey) { await homeKey(adb, opt, print, j); if (!opt.apply) print("Dry run: nothing was changed. Add --apply."); return finish(); }
   if (opt.density !== null) { await density(adb, opt, print, j); if (!opt.apply) print("Dry run: nothing was changed. Add --apply."); return finish(); }
 
   const data = loadData(opt.data);
@@ -774,20 +860,7 @@ async function main(opt, run, print = console.log, guard = undefined) {
     if (!m) throw new Refusal(`--set wants ns:key=value, got ${kv}`);
     sets.push({ ns: m[1], key: m[2], value: m[3], reason: "--set" });
   }
-  for (const s of sets) {
-    if (!SAFE_VALUE.test(s.value)) throw new Refusal(`refusing the value for ${s.key}: only letters, digits and . : / , - _`);
-    const old = firstLine(await adb.sh(`settings get ${s.ns} ${s.key}`));
-    const oldV = old === "null" || old === "" ? null : old;
-    if (oldV === s.value) { print(`  = ${s.ns} ${s.key} is already ${s.value}`); continue; }
-    if (oldV !== null && !SAFE_VALUE.test(oldV)) { print(`  REFUSED ${s.ns} ${s.key}: its current value "${oldV}" could not be put back exactly, so it is left alone`); continue; }
-    print(`  ${opt.apply ? "SET" : "would set"} ${s.ns} ${s.key}: ${oldV ?? "(unset)"} -> ${s.value}`);
-    if (opt.apply) {
-      const i = j.intend({ action: "setting", ns: s.ns, key: s.key, old: oldV, value: s.value });
-      const r = await adb.sh(`settings put ${s.ns} ${s.key} ${s.value}`);
-      j.settle(i, r.code === 0, r.stderr || r.stdout);
-      if (r.code !== 0) print(`    failed: ${(r.stderr || r.stdout).trim()}`);
-    }
-  }
+  await applySettings(adb, sets, opt, print, j);
   // debloat (skipped when the run is only about settings, unless --only names packages too)
   if (!(opt.settings || opt.set.length) || opt.only) {
     const rows = await plan(adb, data, opt, ident, st);
@@ -886,6 +959,7 @@ async function undo(adb, opt, ident, print) {
     else if (e.action === "grant" && /^android\.permission\.\w+$/.test(e.perm)) step = { sh: `pm revoke ${e.pkg} ${e.perm}` };
     else if (e.action === "appops" && /^\w+$/.test(e.op) && /^\w+$/.test(e.old)) step = { sh: `appops set ${e.pkg} ${e.op} ${e.old}` };
     else if (e.action === "install" && e.wasInstalled === false && OUR_APPS[e.pkg]) step = { uninstall: e.pkg };
+    else if (e.action === "listener" && e.comp === LISTENER) step = { sh: `cmd notification disallow_listener ${e.comp}` };
     else { print(`  ? unknown entry ${JSON.stringify(e)}`); failed++; continue; }
     print(`  ${opt.apply ? "UNDO" : "would undo"}: ${step.sh || `adb uninstall ${step.uninstall}`}`);
     if (!opt.apply) continue;
@@ -944,6 +1018,13 @@ function fakeTv(over = {}) {
     if ((m = /^settings get (\w+) (\S+)$/.exec(c))) return ok((tv.settings[`${m[1]} ${m[2]}`] ?? "null") + "\n");
     if ((m = /^settings put (\w+) (\S+) (\S+)$/.exec(c))) { tv.settings[`${m[1]} ${m[2]}`] = m[3]; return ok(""); }
     if ((m = /^settings delete (\w+) (\S+)$/.exec(c))) { delete tv.settings[`${m[1]} ${m[2]}`]; return ok("Deleted 1 rows\n"); }
+    if ((m = /^cmd notification (allow|disallow)_listener (\S+)$/.exec(c))) {
+      const k = "secure enabled_notification_listeners", l = listOf(tv.settings[k]).filter(x => x !== m[2]);
+      if (m[1] === "allow") l.push(m[2]);
+      if (l.length) tv.settings[k] = l.join(":"); else delete tv.settings[k];
+      return ok("");
+    }
+    if ((m = /^am broadcast -a dev\.designyourtv\.HOME_KEY --ez keep (true|false) -n dev\.designyourtv\/\.HomeToggle$/.exec(c))) { tv.homeKeep = m[1] === "true"; return ok("Broadcast completed: result=0\n"); }
     if (c === "dumpsys webviewupdate") return ok("Current WebView package (name, version): (com.google.android.webview, 120.0.6099.230)\n");
     if (c === "dumpsys wifi") return ok("WifiConfiguration cname=android.uid.system:1000\n");
     if ((m = /^dumpsys package (\S+)$/.exec(c))) {
@@ -959,7 +1040,7 @@ function fakeTv(over = {}) {
   return { tv, run };
 }
 const snapshot = tv => JSON.stringify({ p: [...tv.pkgs].sort(), s: Object.entries(tv.settings).sort() });
-const MUTATING = /^(pm (disable-user|disable|enable|uninstall|grant|revoke)|settings (put|delete)|cmd package install-existing|wm density \S|appops set)/;
+const MUTATING = /^(pm (disable-user|disable|enable|uninstall|grant|revoke)|settings (put|delete)|cmd package install-existing|wm density \S|appops set|cmd notification (allow|disallow)_listener)/;
 
 // The fake TV has no foreground to read, so the selftest runs tv-guard as allow-all (tools/test/tv-guard.test.mjs covers the guard itself).
 const allowGuard = async () => ({ ok: true });
@@ -1141,6 +1222,50 @@ async function selftest() {
     return true;
   });
 
+  await test("first run: install, the music card's reader and our screensaver switched on, all in one log that undoes", async () => {
+    const { tv, run } = fakeTv();
+    const before = snapshot(tv);
+    const adb = guardedAdb(run, base.serial, allowGuard);
+    const ident = { model: tv.props["ro.product.model"], sdk: 34 };
+    const opt = { ...base, apply: true, date: "2099-01-05" };
+    const j = journal(opt, ident);
+    const installed = [];
+    await firstRun(adb, ident, opt, p, j, { installDream: async () => { installed.push("dream"); } });
+    j.close();
+    if (installed.length !== 1) return "the APK step did not run";
+    if (tv.settings["secure screensaver_components"] !== DREAM_COMP) return `screensaver is ${tv.settings["secure screensaver_components"]}`;
+    if (tv.settings["secure screensaver_enabled"] !== "1") return "screensaver not switched on (a TV with it off would never show the painting)";
+    if (tv.settings["secure enabled_notification_listeners"] !== LISTENER) return "the music card's reader was not allowed";
+    if (tv.settings["secure enabled_accessibility_services"] !== undefined) return "first run touched Home (that is --home-key's job, on request)";
+    // a second run changes nothing and logs nothing
+    const j2 = journal(opt, ident); const n0 = j2.changes;
+    await firstRun(adb, ident, opt, p, j2, { installDream: async () => {} }); j2.close();
+    if (j2.changes !== n0) return "a second first-run logged changes";
+    await main({ ...base, apply: true, undo: path.join(tmp, "tv-undo-2099-01-05.json") }, run, p, allowGuard);
+    if (snapshot(tv) !== before) return `state after undo differs: ${snapshot(tv)}`;
+    return true;
+  });
+
+  await test("home key: on merges with services already on, off removes only ours, both undo", async () => {
+    const { tv, run } = fakeTv({ settings: { ...fakeTv().tv.settings, "secure enabled_accessibility_services": "com.other/.Reader" } });
+    const before = snapshot(tv);
+    await main({ ...base, apply: true, homeKey: "on", date: "2099-01-06" }, run, p, allowGuard);
+    if (tv.settings["secure enabled_accessibility_services"] !== `com.other/.Reader:${HOME_KEY_SVC}`) return `on gave ${tv.settings["secure enabled_accessibility_services"]}`;
+    if (tv.settings["secure accessibility_enabled"] !== "1") return "accessibility not switched on";
+    if (tv.homeKeep !== true) return "the app was not told to keep the service on";
+    const again = await main({ ...base, apply: true, homeKey: "on", date: "2099-01-06" }, run, p, allowGuard);
+    if (again.changes) return "a second on changed something";
+    await main({ ...base, apply: true, homeKey: "off", date: "2099-01-06" }, run, p, allowGuard);
+    if (tv.settings["secure enabled_accessibility_services"] !== "com.other/.Reader") return `off gave ${tv.settings["secure enabled_accessibility_services"]}`;
+    if (tv.homeKeep !== false) return "the app was not told to let it go";
+    if (a11yWith("a/.X:dev.designyourtv/dev.designyourtv.HomeKeyService", HOME_KEY_SVC) !== null) return "the long spelling was not seen as ours";
+    if (a11yWithout(HOME_KEY_SVC, HOME_KEY_SVC) !== null) return "only ours, removed, should leave the setting unset";
+    await main({ ...base, apply: true, undo: path.join(tmp, "tv-undo-2099-01-06.json") }, run, p, allowGuard);
+    tv.homeKeep = undefined;
+    if (snapshot(tv) !== before) return `state after undo differs: ${snapshot(tv)}`;
+    return true;
+  });
+
   await test("the real tv-debloat.json is valid", async () => {
     const errs = validateData(loadData(DEFAULT_DATA));
     return errs.length ? errs.slice(0, 3).join("; ") : true;
@@ -1170,4 +1295,4 @@ if (isMain) {
     process.exit(e instanceof GateFailed ? 4 : e instanceof Refusal ? 3 : 1);
   });
 }
-export { main, plan, selftest, Refusal, GateFailed, guardedAdb, parseArgs, fakeTv, mutationTarget, HARD_PROTECTED, STOCK_LAUNCHERS };
+export { main, plan, selftest, Refusal, GateFailed, guardedAdb, parseArgs, fakeTv, mutationTarget, HARD_PROTECTED, STOCK_LAUNCHERS, firstRun, homeKey };

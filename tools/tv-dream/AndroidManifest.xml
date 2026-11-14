@@ -128,6 +128,7 @@
         <receiver android:name=".HomeToggle" android:exported="true" android:permission="android.permission.WRITE_SECURE_SETTINGS">
             <intent-filter>
                 <action android:name="dev.designyourtv.HOME" />
+                <action android:name="dev.designyourtv.HOME_KEY" />
             </intent-filter>
         </receiver>
 
