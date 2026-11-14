@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // A demo hub: the real server with sample data in place of every reader, so the page can be tried in a browser with no TV,
 // no phones, no adb, no keys and no network. It reads nothing from this machine and writes only to a throwaway folder.
-//   node hub/tools/demo.mjs [--port 8790]
+//   node hub/tools/demo.mjs [--port 8790] [--config <file>]   (--config: start from your own config.json instead of the example)
 //   then open http://127.0.0.1:8790/tv-setup.html?kiosk=tv  (the TV)  or  http://127.0.0.1:8790/tv-setup.html  (setup)
 import fs from "node:fs";
 import os from "node:os";
@@ -14,7 +14,7 @@ const ROOT = path.resolve(HERE, "..", "..");
 const arg = (name, dflt) => { const i = process.argv.indexOf(name); return i > 0 ? process.argv[i + 1] : dflt; };
 
 const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "designyourtv-demo-"));
-fs.copyFileSync(path.join(ROOT, "examples", "config.example.json"), path.join(stateDir, "config.json"));
+fs.copyFileSync(path.resolve(arg("--config", path.join(ROOT, "examples", "config.example.json"))), path.join(stateDir, "config.json"));
 
 const iso = ms => new Date(ms).toISOString();
 const inMin = m => iso(Date.now() + m * 60e3);
