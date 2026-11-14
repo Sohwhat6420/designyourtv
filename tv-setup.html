@@ -926,7 +926,8 @@ html.lite .remind { -webkit-backdrop-filter: none; backdrop-filter: none; backgr
 /* at night the equaliser comes to rest: the only thing moving in a dark room otherwise */
 .stage.night .np { opacity: .6; }
 .stage.night .np .eq i { animation: none; transform: scaleY(.45); }
-.stage.dock-up:not(.laptop) .np { bottom: 11.6cqw; }
+/* 14 Nov: high enough to clear the focused app's name above the dock (at 11.6cqw the card hid most of it) */
+.stage.dock-up:not(.laptop) .np { bottom: 14.4cqw; }
 /* 3 Nov night, the owner's note: the card's glass "doesnt look that good, its quite misted". The heavy frost (1.6cqw, about 30 px
    on the TV) over an even smoky fill washed the painting to milk. Clear glass instead: a third of the blur so the painting
    still reads through it, its colour kept rich, the darkening only low down where the words sit, a crisp lit top edge and
