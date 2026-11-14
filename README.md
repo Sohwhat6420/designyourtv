@@ -1,39 +1,173 @@
+<img src="docs/hero.webp" width="100%" alt="The clock stands behind the painting: a TV showing an oil painting of two F-22s over snowy mountains at dusk, the clock 10:47 behind the nearer jet, glass widgets either side.">
+
 # designyourtv
 
-**Your Google TV's idle screen becomes a painted lock screen, with the clock standing behind the painting.**
+**A Google TV screensaver where the clock stands behind the painting, not on top of it.** Hills, clouds and jets pass
+in front of the digits, the way they do on an iPhone lock screen, and the widgets around it never fake a number.
 
 [![test](https://github.com/Sohwhat6420/designyourtv/actions/workflows/test.yml/badge.svg)](https://github.com/Sohwhat6420/designyourtv/actions/workflows/test.yml)
 ![licence: MIT](https://img.shields.io/badge/licence-MIT-blue)
 ![Google TV and Android TV](https://img.shields.io/badge/Google%20TV-Android%20TV-3DDC84?logo=android&logoColor=white)
+![npm dependencies: 0](https://img.shields.io/badge/npm%20dependencies-0-555)
 
-<img src="docs/screens/tv.webp" width="100%" alt="The TV: an oil painting of two F-22s over snowy mountains at dusk. The clock, 10:47, sits behind the nearer jet; glass widgets either side show the calendar, the next event, buses, batteries, Claude limits and the week's usage, and a music card sits at the bottom.">
+<img src="docs/screens/depth-detail.webp" width="100%" alt="Close up: the serif digits 10:47 sit behind the nearer F-22, whose nose and wing cross in front of the 4 and the 7.">
 
-<sub>The repo's own demo with sample readings, at the TV panel's 1920 × 1080. The painting is an oil-paint repaint,
-made with an image model, of a public-domain U.S. Air Force photo (<a href="#credits">credits</a>).</sub>
+<sub>Close up: the jet's nose and wing cross in front of the 4 and the 7.</sub>
 
-- **The clock sits inside the painting.** Each painting is cut into layers once, on your own computer, by two small ONNX models. The
-  clock is drawn between the layers, and depth pauses whenever a foreground would hide more than 38 % of the digits.
-- **Widgets that never fake a number.** They show the calendar, live buses, batteries, Claude limits, the weather and
-  music, and a stale reading greys out and says how old it is.
-- **The remote stays in charge.** Any arrow raises a dock of apps; Home brings the painting back. The TV side builds
-  on CleanYourTV's findings, so casting keeps working.
+- **The clock is a layer of the painting.** Each painting is cut into four layers once, on your own computer, by two
+  small models (BiRefNet and Depth Anything V2), and the digits are drawn between the layers. When a foreground would
+  hide more than 38 % of the digits, depth pauses for that painting.
+- **Readings that admit their age.** Calendar, buses, batteries, weather, music and Claude limits. A stale reading greys
+  out and says how old it is.
+- **The remote stays in charge.** Any arrow raises a dock of apps; Home brings the painting back. Google TV stays the
+  real Home underneath, so casting keeps working.
 
-## Quick start (no TV needed)
+## Try it in 30 seconds, no TV needed
 
 ```bash
 git clone https://github.com/Sohwhat6420/designyourtv && cd designyourtv
-node hub/tools/demo.mjs   # Node 22; then open http://127.0.0.1:8790/tv-setup.html?kiosk=tv
+node hub/tools/demo.mjs
 ```
 
-The demo runs the real hub with sample readings. It touches no adb, no device and nothing on your machine; the page
-fetches its fonts from Google Fonts. Press an
-arrow key for the dock, or open `tv-setup.html` without `?kiosk=tv` for the setup page.
+Then open <http://127.0.0.1:8790/tv-setup.html?kiosk=tv> and press an arrow key for the dock. Leave out `?kiosk=tv` for
+the setup page. You need Node 22 and nothing else. The demo runs the real hub with sample readings and touches no adb,
+no device and nothing on your machine; the page fetches its fonts from Google Fonts.
 
-It is the frontend half of a TV clean-up. The backend half (what is safe to switch off on a Google TV, how to keep
-casting working, how to take over the Home button without replacing the launcher) builds on
-[CleanYourTV](https://github.com/Gathin23/cleanyourtv): see [Built on CleanYourTV's findings](#built-on-cleanyourtvs-findings).
-Want the same look on a Windows desktop? That is [designyourwindows](https://github.com/Sohwhat6420/designyourwindows),
-kept separate and deliberately small.
+## What it looks like
+
+![The TV: an oil painting of two F-22s over snowy mountains at dusk. The clock, 10:47, sits behind the nearer jet; glass widgets either side show the calendar, the next event, buses, batteries, Claude limits and the weather, and a music card sits at the bottom.](docs/screens/tv.webp)
+
+![A second painting: one F-22 climbing past a storm cloud at sunset, the clock in a lighter serif face](docs/screens/tv-thunderhead.webp)
+
+Per painting you pick the clock's face (ten, from condensed to didone), its colour (or *auto*, sampled from the
+painting), the material (ghost, liquid glass, tinted), size, stretch, position, and whether hours stack over minutes.
+Changing painting is one 1.7 s move: a slow camera push, the digits cascading into the new face, the widgets stepping
+back and returning in the new palette. Bring your own paintings with [the plate walkthrough](docs/make-a-plate.md).
+
+![The dock up: the apps on the left island, the app drawer, inputs and settings on the right](docs/screens/tv-dock.webp)
+
+Press any arrow and the dock rises: your apps on the left, the app drawer, the TV's inputs and settings on the right.
+OK opens an app, fast-forward and rewind step through the paintings, and Home brings the painting back. On the
+painting, OK is a night veil: one dark layer over everything with the backlight held low. After a quiet spell the TV
+dims to an always-on look with the clock still live.
+
+![The setup page: the preview with the dock up, the painting's settings beside it](docs/screens/setup.webp)
+
+The setup page, open in any browser on your network, is where you decide what the TV shows. It saves as you go and the
+TV follows as you save. The TV only ever shows the configuration; it never changes it.
+
+<sub>Every screen above is the demo in headless Chromium at a TV panel's 1920 × 1080. App icons are not included (they
+are the apps' own artwork), so the dock shows each app's letter until you add icons: see
+[Configuration](#configuration).</sub>
+
+## Put it on your TV
+
+Tested on a Xiaomi Google TV (Android 11); the tools also know Google TV 14 and the older Android TV launcher. You need
+[adb](https://developer.android.com/tools/releases/platform-tools), a JDK 17 and the Android SDK's build-tools and
+`platforms;android-34` (Android Studio's SDK manager, or `sdkmanager`; set `ANDROID_HOME` if the SDK isn't in Android
+Studio's default place). No Gradle. Every step below that changes the
+TV is a dry run first, logged before it is sent, and undoable.
+
+**1. Turn on debugging.** On the TV: *Settings > System > About*, press OK on *Android TV OS build* seven times, then
+*Settings > System > Developer options > USB debugging*. Connect and accept the prompt on the TV:
+
+```bash
+adb connect <tv-ip>:5555
+```
+
+Whatever address `adb connect` accepted is your `--serial` from here on (newer Google TVs use another port: see
+[If something is off](#if-something-is-off)).
+
+**2. Start the hub** on a computer that stays on. Leave it running, note the line it prints, and use a second terminal
+for the next steps:
+
+```bash
+mkdir -p hub/state && cp examples/config.example.json hub/state/config.json
+node hub/server.mjs
+# build the TV's APK with one of: --hub http://192.168.1.10:8790
+```
+
+**3. Build the TV app** with that address baked in. It runs the unit tests, signs the APK with a debug key it makes on
+the first build, and checks the result:
+
+```bash
+JAVA_HOME=/path/to/jdk-17 node tools/build-tv-apk.mjs --hub http://192.168.1.10:8790
+```
+
+<details>
+<summary>On Windows PowerShell, steps 2 and 3</summary>
+
+```powershell
+New-Item -ItemType Directory -Force hub/state | Out-Null; Copy-Item examples/config.example.json hub/state/config.json
+node hub/server.mjs
+# in a second window:
+$env:JAVA_HOME = "C:\path\to\jdk-17"; node tools/build-tv-apk.mjs --hub http://192.168.1.10:8790
+```
+</details>
+
+**4. Install it in one run.** Read the dry run, then add `--apply`:
+
+```bash
+node tools/tv-apply.mjs --serial <tv-ip>:5555 --tv-ip <tv-ip> --first-run
+node tools/tv-apply.mjs --serial <tv-ip>:5555 --tv-ip <tv-ip> --first-run --apply
+```
+
+That installs the app with its two grants, lets the music card see what the TV is playing, and makes the painting the
+screensaver, switched on. To see it now: *Settings > System > Ambient mode* (on older TVs, *Screen saver*) > *Start
+now*. Otherwise it appears when the TV next goes idle.
+
+**Optional: Home opens the painting.** This turns on the app's accessibility service alongside any you already have;
+Google TV stays the real Home, and a long press of Home still opens its panel.
+
+```bash
+node tools/tv-apply.mjs --serial <tv-ip>:5555 --tv-ip <tv-ip> --home-key on --apply    # undo: --home-key off --apply
+```
+
+**Undo everything** with the log the run printed:
+
+```bash
+node tools/tv-apply.mjs --serial <tv-ip>:5555 --tv-ip <tv-ip> --undo devices/tv-undo-<date>.json --apply
+```
+
+### If something is off
+
+| What you see | What to do |
+| --- | --- |
+| `TV GUARD refused ...: <app> is in front` | Press Home on the remote, then run it again. Installs are allowed over the home screen and TV Settings; anything that changes the screen waits until no app is playing. |
+| `TV is Dreaming` or `TV is Asleep` | Press any button on the remote so the home screen shows, then run it again. |
+| `could not read what is in front` | Check `adb devices` lists the TV as `device`, not `unauthorized`: accept the prompt on the TV. |
+| `adb connect` fails | Newer Google TVs use *Wireless debugging*: turn it on in Developer options, run `adb pair <ip>:<port>` with the code it shows, then `adb connect` to the address it lists, and use that address as `--serial`. |
+| The clock and date on the built-in painting, but no widgets | That is the offline copy: the TV can't reach the hub. Allow Node.js through the firewall on private networks (Windows asks once), and check the APK was built with the address the hub printed. Give the hub computer a reserved address on your router so it never changes. |
+| The painting never starts by itself | The TV's own idle timer decides: *Settings > System > Ambient mode > Start after* (or *Screen saver > When to start*). |
+| `quiet hours: ...` | You set quiet hours (below). Run it outside them, or with `TV_GUARD_ALLOW_EVENING=1` for that one run. |
+
+<details>
+<summary><b>Quiet hours: keep the tools off the TV while people watch</b></summary>
+
+There are none by default. Set them for your household, in the TV's local time zone:
+
+```bash
+TV_GUARD_QUIET_HOURS=18-1 TV_GUARD_TZ=Europe/London node tools/tv-apply.mjs ...
+```
+
+or put `{ "quiet_hours": "18-1", "tz": "Europe/London" }` in `devices/tv-guard.json`. Inside them anything that changes
+the screen is refused; read-only commands still run. `node tools/tv-guard.mjs status` shows what is in force.
+</details>
+
+<details>
+<summary><b>Debloat, reversibly</b></summary>
+
+`tools/tv-debloat.json` sorts the TV's packages into tiers. Review the dry run, then add `--apply`:
+
+```bash
+node tools/tv-apply.mjs --serial <tv-ip>:5555 --tv-ip <tv-ip> --backup    # read-only snapshot first
+node tools/tv-apply.mjs --serial <tv-ip>:5555 --tv-ip <tv-ip>             # the "safe" tier, dry run
+```
+
+It only ever disables (`pm disable-user`), never a full uninstall, never root, never a reboot. It refuses anything that
+isn't a TV, the launcher, the setup wizard Google TV needs for casting, and anything serving an HDMI input or the tuner.
+`--undo devices/tv-undo-<date>.json --apply`, with the same `--serial` and `--tv-ip`, reverses a run.
+</details>
 
 ## How it works
 
@@ -42,83 +176,21 @@ flowchart LR
   setup["Setup page<br/>any browser on the LAN"] -- "saves as you go" --> cfg[("config.json<br/>with history")]
   subgraph hub["Hub: one always-on computer, port 8790, LAN and loopback only, zero dependencies"]
     cfg --> srv["hub/server.mjs"]
-    rd["Readers<br/>LTA buses, ICS calendar, NEA weather,<br/>phones over adb, Claude limits"] --> srv
+    rd["Readers<br/>ICS calendar, buses, weather,<br/>phones over adb, Claude limits"] --> srv
   end
-  srv -- "server-sent events:<br/>config, readings, music" --> tv["TV: dev.designyourtv<br/>screensaver, Wallpaper tile,<br/>Home key service, dock"]
+  srv -- "server-sent events:<br/>config, readings, music" --> tv["TV: dev.designyourtv<br/>screensaver, Home key service, dock"]
   srv -- "on and off through tools/tv-guard.mjs<br/>(adb, Wake-on-LAN, Cast)" --> tv
 ```
 
-The TV only ever shows the configuration; it never changes it. An offline copy of the page shows whenever the hub
-doesn't answer. The Claude limits widget runs a tiny headless `claude -p` probe on Haiku at most every 10 minutes
-(about USD0.0002 of your subscription each time).
-
-## What it looks like
-
-### Depth-clock paintings
-
-![A second painting: one F-22 climbing past a storm cloud at sunset, the clock in a serif face behind the cloud's edge](docs/screens/tv-thunderhead.webp)
-
-Each painting is four layers: the painting, a foreground cut-out, the same plus near clouds, and the subject alone.
-The clock is drawn between them, so hills, trees and clouds pass in front of the digits the way they do on an iPhone
-lock screen. The cut-outs come from two small ONNX models run once on your own computer
-([make your own plate](docs/make-a-plate.md)). The page guards legibility: when a foreground would hide more than
-38 % of the digits, depth pauses for that painting unless you say otherwise.
-
-Per painting you pick the face (ten, from condensed to didone), the colour (or *auto*, sampled from the painting),
-the material (ghost, liquid glass, tinted), size, stretch, width, where the clock sits, and whether hours stack over
-minutes. Changing painting is a single 1.7 s move: a slow camera push, the digits cascading into the new face,
-the widgets stepping back and returning in the new palette.
-
-### Glass widgets
-
-A calendar month, the next event from any ICS feed, live bus arrivals (Singapore's LTA DataMall, smoothed so a bus
-doesn't flicker out of the list for one bad reading), phone, watch and earbud batteries as iPadOS-style rings, Claude
-plan limits, the weather, and a Dynamic Island-style music card that follows what the TV itself is playing. Every
-reading greys out and says how old it is once it goes stale, and nothing ever shows a made-up "0%" for a reading it
-doesn't have.
-
-### A dock you drive with the remote
-
-![The dock up: the apps on the left island, the app drawer, inputs and settings on the right](docs/screens/tv-dock.webp)
-
-Press any arrow and the dock rises: two islands of glass, your apps on the left and the full app drawer, the TV's
-inputs and settings on the right. OK opens the app. Fast-forward and rewind step through the paintings. Home brings
-the painting back; Home on the painting goes to Google TV for ten minutes.
-
-Small things that make it livable:
-
-- **Night on OK.** On the painting, OK drops one dark veil over everything and holds the panel's backlight low; the
-  widgets stay readable, nothing animates.
-- **Ambient (AOD).** After a quiet spell the TV dims to an always-on look with the clock and widgets still live.
-- **Per-app brightness.** Music apps sit at a mid backlight, films keep yours, and a screen-off button in the dock
-  turns the panel dark while the music plays on.
-- **Fast opens.** The page's scripts pause whenever another app is in front, so the TV's weak chip spends nothing on
-  a wallpaper nobody can see.
-
-### One configuration, every screen
-
-![The setup page: the preview with the dock up, the painting's settings beside it](docs/screens/setup.webp)
-
-The setup page (`tv-setup.html`) is where you decide: Keep or Remove each painting, tune it, and choose the dock's
-apps. It saves to the hub as you go, and the TV (`?kiosk=tv`) follows over server-sent events. The TV only ever shows
-the configuration; it never changes it.
-
-## Paintings and app icons
-
-Every screenshot above is the [quick-start](#quick-start-no-tv-needed) demo in headless Chromium. `plates/` holds
-two paintings with clean rights (see [credits](#credits)) and two placeholder scenes drawn by
-`tools/make-placeholder.py`; bring your own with [the plate walkthrough](docs/make-a-plate.md). App icons are not included (they are the apps' own artwork): put 192 px
-`.webp` files in `icons/tv/` named after the app ids in `tv-setup.html`, or leave them out and each tile shows its
-letter.
-
-## Run the real hub
-
-```bash
-mkdir -p hub/state && cp examples/config.example.json hub/state/config.json
-node hub/server.mjs
-```
+The TV app is a small screensaver that shows the hub's page full screen; an offline copy shows whenever the hub doesn't
+answer. The Claude limits widget runs a tiny headless `claude -p` probe on Haiku at most every 10 minutes (a negligible
+share of your plan's limits). The bus widget reads Singapore's LTA DataMall; the other readers work
+anywhere.
 
 ### Configuration
+
+<details>
+<summary><b>Files and variables</b></summary>
 
 Everything personal lives in `hub/state/`, which git ignores:
 
@@ -138,115 +210,46 @@ Everything personal lives in `hub/state/`, which git ignores:
 | `TV_WEATHER_AREA` | `City` | the NEA two-hour forecast area |
 | `TV_PHONES_FILE`, `TV_BUS_FILE`, `TV_LTA_KEY_FILE` | `hub/state/…` | other places for those files |
 | `TV_ADB` | `adb` | the adb the hub uses |
-| `TV_TZ_OFFSET` | `8` | hours from UTC for the reminders' quiet hours |
+| `TV_TZ_OFFSET` | `8` | hours from UTC for the reminders' quiet hours (set yours) |
 | `TV_CONTACT_URL` | none | your repo or a contact page, sent in the lyrics lookup's User-Agent |
 
-Switch the TV on or off from the hub machine with `node hub/tools/tv-power.mjs on|off|status`: adb when the TV
-answers, else Wake-on-LAN, else a Cast launch. `off` is refused while another app is in front.
-
-## Put it on the TV
-
-Built on a Xiaomi Google TV; `tv-apply.mjs` also knows the older PatchWall launcher. You need
-[adb](https://developer.android.com/tools/releases/platform-tools), a JDK 17 and the Android SDK's build-tools and
-`platforms;android-34` (Android Studio's SDK manager, or `sdkmanager`). No Gradle.
-
-1. **Network debugging.** On the TV: Settings → System → About → press OK on *Android TV OS build* seven times. Then
-   Settings → System → Developer options → turn on *USB debugging* (on most TVs this covers network debugging too).
-2. **Connect** and accept the prompt on the TV:
-
-   ```bash
-   adb connect <tv-ip>:5555
-   ```
-
-3. **Check before you change anything.** `tools/tv-apply.mjs` refuses anything that isn't a TV, works on one explicit
-   serial, and is a dry run unless you add `--apply`:
-
-   ```bash
-   node tools/tv-apply.mjs --serial <tv-ip>:5555 --tv-ip <tv-ip> --identify
-   node tools/tv-apply.mjs --serial <tv-ip>:5555 --tv-ip <tv-ip> --backup
-   ```
-
-4. **Build the APK** with your hub's address baked in:
-
-   ```bash
-   JAVA_HOME=/path/to/jdk-17 node tools/build-tv-apk.mjs --hub http://<hub-ip>:8790
-   ```
-
-   It runs the unit tests first, then writes `apk/tv-dream/designyourtv.apk`, signed with a debug key made for you on
-   the first build, and checks the result (signature, manifest, contents). Optional: `--mirror http://<ip>:8792` names
-   a second always-on device that serves lighter JPEG copies of the paintings, which decode faster on a TV's weak chip;
-   without it everything comes from the hub.
-5. **Install it and make it the screensaver:**
-
-   ```bash
-   node tools/tv-apply.mjs --serial <tv-ip>:5555 --tv-ip <tv-ip> --install-dream --apply
-   node tools/tv-apply.mjs --serial <tv-ip>:5555 --tv-ip <tv-ip> --set secure:screensaver_components=dev.designyourtv/.WallDream --apply
-   ```
-
-6. **Let Home open the painting** (optional). This turns on the app's accessibility service; Google TV stays the real
-   Home underneath:
-
-   ```bash
-   adb -s <tv-ip>:5555 shell settings put secure enabled_accessibility_services dev.designyourtv/.HomeKeyService
-   adb -s <tv-ip>:5555 shell settings put secure accessibility_enabled 1
-   ```
-
-   If `adb shell settings get secure enabled_accessibility_services` already lists other services, join them with
-   `:` instead of replacing them. **Undo:**
-
-   ```bash
-   adb -s <tv-ip>:5555 shell settings delete secure enabled_accessibility_services
-   ```
-
-7. **Debloat** (optional, reversible). `tools/tv-debloat.json` sorts the TV's packages into tiers; review the dry run
-   first, then `--apply`. Every change is logged before it is sent, and `--undo devices/tv-undo-<date>.json --apply`
-   reverses it.
-
-   ```bash
-   node tools/tv-apply.mjs --serial <tv-ip>:5555 --tv-ip <tv-ip>
-   ```
-
-## Make your own plate
-
-See [docs/make-a-plate.md](docs/make-a-plate.md): from any landscape image to the four layers in one command, then one
-line in `tv-setup.html`.
+App icons: put 192 px `.webp` files in `icons/tv/`, named after the app ids in `tv-setup.html`. Switch the TV on or off
+from the hub with `node hub/tools/tv-power.mjs on|off|status` (adb, else Wake-on-LAN, else a Cast launch); `off` is
+refused while another app is in front.
+</details>
 
 ## Built on CleanYourTV's findings
 
-[CleanYourTV](https://github.com/Gathin23/cleanyourtv) (MIT, by Gathin) is the backend reference for this project:
-what is safe to disable on a Google TV, and how a TV behaves once you do. What designyourtv took from it, rewritten
-for this TV:
+[CleanYourTV](https://github.com/Gathin23/cleanyourtv) (MIT, by Gathin) is the backend reference: what is safe to
+disable on a Google TV, and how a TV behaves once you do. What designyourtv took from it, rewritten for this app:
 
-- **Home through an accessibility service, not a replacement launcher.** CleanYourTV's `HomeKeyService` listens for
-  the Home key instead of making itself the launcher. Here `dev.designyourtv.HomeKeyService` does the same: Android
-  still handles Home (a long press still opens Google TV's panel) and a short press opens the painting a moment later.
-- **Keep setupwraith on Google TV.** Disabling the setup wizard (`com.google.android.tungsten.setupwraith`) stops
-  casting, and on Google TV 14 a Home that falls back to its RecoveryActivity soft-reboots the TV every minute or so.
-  `tv-apply.mjs` refuses both orders of that mistake.
-- **Start the painting like an app, so launcherx keeps the Home role.** Opening it as a Home intent takes the role
-  from launcherx (`com.google.android.apps.tv.launcherx`), which then can no longer open apps for the remote's own
-  buttons. Started as an ordinary activity from the background, it can.
-- **The boot window event that never comes.** At boot, launcherx is often on screen before the accessibility service
-  is bound, so no window event arrives. The service reads the usage log for what is in front instead.
-- **Guards before disabling anything.** The core package list and the rule that anything serving a TV input (HDMI, the
-  tuner) stays on follow CleanYourTV's `tools/disable.sh`.
+- **Home through an accessibility service, not a replacement launcher.** Android still handles Home, and a short press
+  opens the painting a moment later.
+- **Keep setupwraith on Google TV.** Disabling the setup wizard stops casting, and on Google TV 14 a Home that falls
+  back to its RecoveryActivity soft-reboots the TV every minute or so. `tv-apply.mjs` refuses both orders of that
+  mistake.
+- **Start the painting like an app,** so launcherx keeps the Home role and the remote's own app buttons keep working.
+- **The boot window event that never comes.** At boot the launcher is often on screen before the service binds, so the
+  service reads the usage log for what is in front instead.
+- **Guards before disabling anything,** following CleanYourTV's `tools/disable.sh`.
+
+Want the same look on a Windows desktop? That is [designyourwindows](https://github.com/Sohwhat6420/designyourwindows).
 
 ## Tests
 
 ```bash
 node --test hub/test/*.test.mjs                      # the hub: config, SSE, net guard, readers, TV power, static files
-node --test tools/test/*.test.mjs                    # tv-guard: what may run on the TV, and when
+node --test tools/test/*.test.mjs                    # tv-guard, and a first run against a fake TV over a fake adb
+node tools/tv-apply.mjs --selftest                   # tv-apply against an in-process fake TV, undo round trips included
 JAVA_HOME=/path/to/jdk-17 node tools/build-tv-apk.mjs --test-only   # the APK's core logic on a plain JVM
-node tools/tv-apply.mjs --selftest                   # tv-apply against an in-process fake TV
 ```
 
 ## Privacy and safety
 
 - The hub answers only LAN and loopback addresses, checks the Host header against DNS rebinding, and never serves
   `hub/state/`, keys or logs. API keys and calendar addresses are cut out of every log line and error.
-- `tv-apply.mjs` only makes changes it can undo, logs each one before sending it, and refuses phones by address,
-  serial and model so a phone on the same adb server is never touched. The hub's TV keeper only ever talks to the
-  TV's own serial.
+- `tv-apply.mjs` only makes changes it can undo, logs each one before sending it, works on one explicit serial, and
+  refuses anything that isn't a TV, so a phone on the same adb server is never touched.
 - The repository was swept for secrets and personal data before publishing: [docs/security-sweep.md](docs/security-sweep.md).
 
 ## Credits
