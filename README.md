@@ -2,8 +2,7 @@
 
 # designyourtv
 
-**A Google TV screensaver where the clock stands behind the painting, not on top of it.** Hills, clouds and jets pass
-in front of the digits, the way they do on an iPhone lock screen, and the widgets around it never fake a number.
+**A screensaver for Google TV and Android TV.** Hills, clouds and jets pass in front of the digits, the way they do on an iPhone lock screen, and the widgets around it never fake a number.
 
 [![test](https://github.com/Sohwhat6420/designyourtv/actions/workflows/test.yml/badge.svg)](https://github.com/Sohwhat6420/designyourtv/actions/workflows/test.yml)
 ![licence: MIT](https://img.shields.io/badge/licence-MIT-blue)
@@ -35,8 +34,6 @@ no device and nothing on your machine; the page fetches its fonts from Google Fo
 
 ## What it looks like
 
-![The TV: an oil painting of two F-22s over snowy mountains at dusk. The clock, 10:47, sits behind the nearer jet; glass widgets either side show the calendar, the next event, buses, batteries, Claude limits and the weather, and a music card sits at the bottom.](docs/screens/tv.webp)
-
 ![A second painting: one F-22 climbing past a storm cloud at sunset, the clock in a lighter serif face](docs/screens/tv-thunderhead.webp)
 
 Per painting you pick the clock's face (ten, from condensed to didone), its colour (or *auto*, sampled from the
@@ -50,6 +47,8 @@ Press any arrow and the dock rises: your apps on the left, the app drawer, the T
 OK opens an app, fast-forward and rewind step through the paintings, and Home brings the painting back. On the
 painting, OK is a night veil: one dark layer over everything with the backlight held low. After a quiet spell the TV
 dims to an always-on look with the clock still live.
+
+![The TV: an oil painting of two F-22s over snowy mountains at dusk. The clock, 10:47, sits behind the nearer jet; glass widgets either side show the calendar, the next event, buses, batteries, Claude limits and the weather, and a music card sits at the bottom.](docs/screens/tv.webp)
 
 ![The setup page: the preview with the dock up, the painting's settings beside it](docs/screens/setup.webp)
 
@@ -108,8 +107,8 @@ $env:JAVA_HOME = "C:\path\to\jdk-17"; node tools/build-tv-apk.mjs --hub http://1
 **4. Install it in one run.** Read the dry run, then add `--apply`:
 
 ```bash
-node tools/tv-apply.mjs --serial <tv-ip>:5555 --tv-ip <tv-ip> --first-run
-node tools/tv-apply.mjs --serial <tv-ip>:5555 --tv-ip <tv-ip> --first-run --apply
+node tools/tv-apply.mjs --serial <tv-ip>:<port> --tv-ip <tv-ip> --first-run
+node tools/tv-apply.mjs --serial <tv-ip>:<port> --tv-ip <tv-ip> --first-run --apply
 ```
 
 That installs the app with its two grants, lets the music card see what the TV is playing, and makes the painting the
@@ -120,13 +119,13 @@ now*. Otherwise it appears when the TV next goes idle.
 Google TV stays the real Home, and a long press of Home still opens its panel.
 
 ```bash
-node tools/tv-apply.mjs --serial <tv-ip>:5555 --tv-ip <tv-ip> --home-key on --apply    # undo: --home-key off --apply
+node tools/tv-apply.mjs --serial <tv-ip>:<port> --tv-ip <tv-ip> --home-key on --apply    # undo: --home-key off --apply
 ```
 
 **Undo everything** with the log the run printed:
 
 ```bash
-node tools/tv-apply.mjs --serial <tv-ip>:5555 --tv-ip <tv-ip> --undo devices/tv-undo-<date>.json --apply
+node tools/tv-apply.mjs --serial <tv-ip>:<port> --tv-ip <tv-ip> --undo devices/tv-undo-<date>.json --apply
 ```
 
 ### If something is off
@@ -136,7 +135,7 @@ node tools/tv-apply.mjs --serial <tv-ip>:5555 --tv-ip <tv-ip> --undo devices/tv-
 | `TV GUARD refused ...: <app> is in front` | Press Home on the remote, then run it again. Installs are allowed over the home screen and TV Settings; anything that changes the screen waits until no app is playing. |
 | `TV is Dreaming` or `TV is Asleep` | Press any button on the remote so the home screen shows, then run it again. |
 | `could not read what is in front` | Check `adb devices` lists the TV as `device`, not `unauthorized`: accept the prompt on the TV. |
-| `adb connect` fails | Newer Google TVs use *Wireless debugging*: turn it on in Developer options, run `adb pair <ip>:<port>` with the code it shows, then `adb connect` to the address it lists, and use that address as `--serial`. |
+| `adb connect` fails | Newer Google TVs use *Wireless debugging*: turn it on in Developer options, run `adb pair <ip>:<port>` with the code it shows, then `adb connect` to the address it lists, and use that address as `--serial` (an IP and port, not the `adb-…-tls-connect` name adb may pick up by itself). |
 | The clock and date on the built-in painting, but no widgets | That is the offline copy: the TV can't reach the hub. Allow Node.js through the firewall on private networks (Windows asks once), and check the APK was built with the address the hub printed. Give the hub computer a reserved address on your router so it never changes. |
 | The painting never starts by itself | The TV's own idle timer decides: *Settings > System > Ambient mode > Start after* (or *Screen saver > When to start*). |
 | `quiet hours: ...` | You set quiet hours (below). Run it outside them, or with `TV_GUARD_ALLOW_EVENING=1` for that one run. |
@@ -160,8 +159,8 @@ the screen is refused; read-only commands still run. `node tools/tv-guard.mjs st
 `tools/tv-debloat.json` sorts the TV's packages into tiers. Review the dry run, then add `--apply`:
 
 ```bash
-node tools/tv-apply.mjs --serial <tv-ip>:5555 --tv-ip <tv-ip> --backup    # read-only snapshot first
-node tools/tv-apply.mjs --serial <tv-ip>:5555 --tv-ip <tv-ip>             # the "safe" tier, dry run
+node tools/tv-apply.mjs --serial <tv-ip>:<port> --tv-ip <tv-ip> --backup    # read-only snapshot first
+node tools/tv-apply.mjs --serial <tv-ip>:<port> --tv-ip <tv-ip>             # the "safe" tier, dry run
 ```
 
 It only ever disables (`pm disable-user`), never a full uninstall, never root, never a reboot. It refuses anything that
