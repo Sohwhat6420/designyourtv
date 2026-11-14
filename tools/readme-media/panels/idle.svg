@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 290" width="1200" height="290" role="img" aria-labelledby="t d">
+<title id="t">What the page draws in one second, in three states</title>
+<desc id="d">Three strips, each one second of screen time. With rain in the forecast the strip holds 24 marks: the rain moves in 24 steps a second, not 60, by design. With nothing moving the strip is a flat line: 0 frames drawn in 10 seconds and the app at 0.0 % CPU, measured on the television on 3 and 4 November 2026. With another app in front there is no page to draw: scripts paused, 5.8 MB held and no browser view, measured on 3 November 2026 with an HDMI input in front.</desc>
+<style>
+/*@FONTS*/
+/*@TOKENS*/svg{--ink:#E6EDF3;--ink2:#9198A1;--rule:#30363D;--mark:#7D8590;--acc:#EBA24A;--accink:#10141F}/*@END*/
+text{font-family:"HG","Hanken Grotesk",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;fill:var(--ink)}
+.h{font-size:19px;fill:var(--ink2)}
+.n{font-size:22px;font-weight:600}
+.f{font-size:36px;font-weight:600;letter-spacing:-.012em}
+.s{font-size:17.5px;fill:var(--ink2)}
+.base{stroke:var(--mark);stroke-width:2;stroke-linecap:round;fill:none}
+.gone{stroke:var(--mark);stroke-width:1.5;fill:none;stroke-dasharray:2 7;stroke-linecap:round}
+.tk{fill:var(--acc);animation:tk 3s linear infinite backwards}
+/* one second, at its real pace: each mark lights as its step is drawn, then the strip rests before the next second */
+@keyframes tk{0%{opacity:.22}1.3%{opacity:1}60%{opacity:1}72%{opacity:.22}100%{opacity:.22}}
+@media (prefers-reduced-motion:reduce){.tk{animation:none}}
+</style>
+<text class="h" x="0" y="24">One second of screen time, in three states</text>
+
+<g>
+<rect class="tk" x="4" y="58" width="5" height="56" rx="2.5" style="animation-delay:0ms"/><rect class="tk" x="19" y="58" width="5" height="56" rx="2.5" style="animation-delay:42ms"/><rect class="tk" x="34" y="58" width="5" height="56" rx="2.5" style="animation-delay:83ms"/><rect class="tk" x="49" y="58" width="5" height="56" rx="2.5" style="animation-delay:125ms"/><rect class="tk" x="64" y="58" width="5" height="56" rx="2.5" style="animation-delay:167ms"/><rect class="tk" x="79" y="58" width="5" height="56" rx="2.5" style="animation-delay:208ms"/><rect class="tk" x="94" y="58" width="5" height="56" rx="2.5" style="animation-delay:250ms"/><rect class="tk" x="109" y="58" width="5" height="56" rx="2.5" style="animation-delay:292ms"/><rect class="tk" x="124" y="58" width="5" height="56" rx="2.5" style="animation-delay:333ms"/><rect class="tk" x="139" y="58" width="5" height="56" rx="2.5" style="animation-delay:375ms"/><rect class="tk" x="154" y="58" width="5" height="56" rx="2.5" style="animation-delay:417ms"/><rect class="tk" x="169" y="58" width="5" height="56" rx="2.5" style="animation-delay:458ms"/><rect class="tk" x="184" y="58" width="5" height="56" rx="2.5" style="animation-delay:500ms"/><rect class="tk" x="199" y="58" width="5" height="56" rx="2.5" style="animation-delay:542ms"/><rect class="tk" x="214" y="58" width="5" height="56" rx="2.5" style="animation-delay:583ms"/><rect class="tk" x="229" y="58" width="5" height="56" rx="2.5" style="animation-delay:625ms"/><rect class="tk" x="244" y="58" width="5" height="56" rx="2.5" style="animation-delay:667ms"/><rect class="tk" x="259" y="58" width="5" height="56" rx="2.5" style="animation-delay:708ms"/><rect class="tk" x="274" y="58" width="5" height="56" rx="2.5" style="animation-delay:750ms"/><rect class="tk" x="289" y="58" width="5" height="56" rx="2.5" style="animation-delay:792ms"/><rect class="tk" x="304" y="58" width="5" height="56" rx="2.5" style="animation-delay:833ms"/><rect class="tk" x="319" y="58" width="5" height="56" rx="2.5" style="animation-delay:875ms"/><rect class="tk" x="334" y="58" width="5" height="56" rx="2.5" style="animation-delay:917ms"/><rect class="tk" x="349" y="58" width="5" height="56" rx="2.5" style="animation-delay:958ms"/>
+<path class="base" d="M1 122H359"/>
+<text class="n" x="0" y="164">Rain in the forecast</text>
+<text class="f" x="0" y="208">24 steps a second</text>
+<text class="s" x="0" y="242">Not 60: fewer pictures to draw.</text>
+<text class="s" x="0" y="266">By design, in the page's code.</text>
+</g>
+
+<g>
+<path class="base" d="M421 122H779"/>
+<text class="n" x="420" y="164">Nothing moving</text>
+<text class="f" x="420" y="208">0 frames in 10 s</text>
+<text class="s" x="420" y="242">The app sat at 0.0 % CPU.</text>
+<text class="s" x="420" y="266">Measured 3 and 4 Nov 2026.</text>
+</g>
+
+<g>
+<path class="gone" d="M841 122H1199"/>
+<text class="n" x="840" y="164">Another app in front</text>
+<text class="f" x="840" y="208">5.8 MB held</text>
+<text class="s" x="840" y="242">Scripts paused, no browser view.</text>
+<text class="s" x="840" y="266">Measured 3 Nov 2026, HDMI input in front.</text>
+</g>
+</svg>
