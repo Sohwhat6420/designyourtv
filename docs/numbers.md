@@ -51,6 +51,8 @@ dock. That is the set's own floor, and the frosted dock now sits on it. A painti
 frame of 225 to 270 ms: better, not solved. The time an app takes to show its first picture is mostly the app's own
 start, which the dock cannot change.
 
+The always-on display change was checked only in headless Chromium, not on the TV.
+
 ### Not measured, so not claimed
 
 - **Against Google TV's own home screen.** There is no like-for-like reading of memory, frame times or idle CPU, so
